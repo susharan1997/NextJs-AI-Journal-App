@@ -3,8 +3,10 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 
 const DropdownContainer = styled.div`
-  position: relative;
+  position: absolute;
   display: inline-block;
+  right: 10px;
+  top: 10px;
 `;
 
 const DropdownButton = styled.div`
@@ -57,7 +59,7 @@ const DropdownComponent: React.FC = () => {
   const handleToggle = () => setIsOpen(!isOpen);
 
   const handleSignUp = () => {
-    router.push('/sign-up');
+    router.push('/');
   };
 
   return (

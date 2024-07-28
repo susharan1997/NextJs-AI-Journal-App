@@ -3,12 +3,11 @@ import dbConnect from "@/lib/mongoose";
 import UserModel from '../../../models/User';
 import bcrypt from 'bcryptjs';
 
-export async function POST(request: Request) {
-    await dbConnect();
+export async function POST(request: NextRequest) {
 
     try {
+        await dbConnect();
         const { name, email, password } = await request.json();
-        console.log('hello');
 
         if (!name || !email || !password) {
             return NextResponse.json({ error: 'Please provide all the necessary details!' }, { status: 400 });

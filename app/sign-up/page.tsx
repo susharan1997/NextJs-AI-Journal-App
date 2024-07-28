@@ -61,9 +61,6 @@ const SignUp = () => {
     const name = (form.elements.namedItem('name') as HTMLInputElement).value;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
     const password = (form.elements.namedItem('password') as HTMLInputElement).value;
-    console.log(name, email, password, 'FORM DATA');
-    // document.cookie = email=${email}; path=/;
-    // document.cookie = password=${password}; path=/;
 
     try {
       const res = await fetch('/api/sign-up', {
@@ -75,10 +72,10 @@ const SignUp = () => {
       })
 
       console.log('Request sent, awaiting response...');
-      
+
       const data = await res.json();
       if (res.ok) {
-        router.push('/sign-in');
+        router.push('/sign-in?message=User created successfully!');
       }
       else {
         setError(data.error);

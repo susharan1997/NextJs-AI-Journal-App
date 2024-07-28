@@ -1,6 +1,8 @@
 'use client';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import Banner from '@/components/Banner';
 
 const SignInContainer = styled.div`
   display: flex;
@@ -43,28 +45,59 @@ const Button = styled.button`
 
 const SignIn = () => {
   const router = useRouter();
-  const handleSubmit = (event: React.FormEvent) => {
+  const [error, setError] = useState<string | null>('');
+  const [message, setMessage] = useState<string | null>(null);
+  const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('message');
+    if (msg) {
+      setMessage(msg);
+      setShowBanner(true);
+      setTimeout(() => setShowBanner(false), 3000);
+    }
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const email = (event.target as HTMLFormElement).email.value;
     const password = (event.target as HTMLFormElement).password.value;
 
-    const emailCookies = document.cookie.split('; ').find(row => row.startsWith('email='))?.split('=')[1];
-    const passwordCookies = document.cookie.split('; ').find(row => row.startsWith('password='))?.split('=')[1];
+    try {
+      const response = await fetch('/api/authenticate', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-    if(email === emailCookies && password === passwordCookies){
-      router.push('/new-user');
+      const data = await response.json();
+
+      if (response.ok) {
+        const queryParams = new URLSearchParams({
+          userData: encodeURIComponent(JSON.stringify(data.user))
+        }).toString();
+        router.push(`/journal?${queryParams}`);
+      }
+      else {
+        setError(data.error);
+      }
     }
-    else{
-      alert('Invalid Email or Password!.');
+    catch (error) {
+      setError('An error occurred. Please try again!');
     }
   };
 
   return (
     <SignInContainer>
+      <Banner message={message || ''} show={showBanner} />
       <Title>Sign In</Title>
       <Form onSubmit={handleSubmit}>
         <Input type="email" placeholder="Email" name='email' required />
         <Input type="password" placeholder="Password" name='password' required />
+        {error && <span>{error}</span>}
         <Button type="submit">Sign In</Button>
       </Form>
     </SignInContainer>

@@ -7,11 +7,11 @@ interface UserType extends Document {
     email: string;
     password: string;
     name: string;
-    // createdAt: Date;
-    // updatedAt?: Date;
-    // account?: Types.ObjectId;
-    // entries?: Types.ObjectId[];
-    // analysis?: Types.ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
+    account?: Types.ObjectId;
+    entries?: Types.ObjectId[];
+    analysis?: Types.ObjectId[];
 }
 
 const userSchema = new Schema<UserType>({
@@ -32,31 +32,31 @@ const userSchema = new Schema<UserType>({
     name: {
         type: String,
     },
-    // createdAt: {
-    //     type: Date,
-    //     default: Date.now,
-    // },
-    // updatedAt: {
-    //     type: Date,
-    //     default: Date.now,
-    // },
-    // account: {
-    //     type: String,
-    //     ref: 'Account',
-    // },
-    // entries: [{
-    //     type: Schema.Types.ObjectId, ref: 'JournalEntry',
-    // }],
-    // analysis: [{
-    //     type: Schema.Types.ObjectId, ref: 'EntryAnalysis',
-    // }],
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now,
+    },
+    account: {
+        type: String,
+        ref: 'Account',
+    },
+    entries: [{
+        type: Schema.Types.ObjectId, ref: 'JournalEntry',
+    }],
+    analysis: [{
+        type: Schema.Types.ObjectId, ref: 'EntryAnalysis',
+    }],
 });
 
 userSchema.pre('save', function(next) {
     if(this.isNew){
-        //this.createdAt = new Date();
+        this.createdAt = new Date();
     }
-    //this.updatedAt = new Date();
+    this.updatedAt = new Date();
     next();
 });
 

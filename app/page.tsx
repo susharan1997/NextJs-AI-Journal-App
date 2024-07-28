@@ -1,7 +1,6 @@
 'use client';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
-import DropdownComponent from '../components/DropdownComponent';
 
 const LandingPageContainer = styled.div`
   display: flex;
@@ -80,14 +79,13 @@ const LandingPage: React.FC = () => {
     <LandingPageContainer>
       <Header>
         <Title>MindScribe</Title>
-        <DropdownComponent />
       </Header>
       <Body>
         <BodyTitle>Welcome to the MindScribe App!</BodyTitle>
         <Text>
-          This is a tool that analyses users' emotions based on their journal entries and logs the data to plot graphs related to the same.
+          This is a tool that analyses users&apos; emotions based on their journal entries and logs the data to plot graphs related to the same.
         </Text>
-        <Button onClick={handleStart}>Let's get started!</Button>
+        <Button onClick={handleStart}>Let&apos;s get started!</Button>
       </Body>
       <Footer>© 2024 MindScribe App. All rights reserved.</Footer>
     </LandingPageContainer>
@@ -95,6 +93,3 @@ const LandingPage: React.FC = () => {
 };
 
 export default LandingPage;
-
-//mongodb remote cluster account old connection string
-//MONGODB_URI=mongodb+srv://<susharanhonnal>:<ITqzhjshV0ldbQi1>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority
