@@ -43,7 +43,7 @@ const Button = styled.button`
   }
 `;
 
-const SignIn = () => {
+function SignIn() {
   const router = useRouter();
   const [error, setError] = useState<string | null>('');
   const [message, setMessage] = useState<string | null>(null);
@@ -76,10 +76,8 @@ const SignIn = () => {
       const data = await response.json();
 
       if (response.ok) {
-        const queryParams = new URLSearchParams({
-          userData: encodeURIComponent(JSON.stringify(data.user))
-        }).toString();
-        router.push(`/journal?${queryParams}`);
+        localStorage.setItem('user', JSON.stringify({ id: data.user.id, name: data.user.name }));
+        router.push(`/journal`);
       }
       else {
         setError(data.error);

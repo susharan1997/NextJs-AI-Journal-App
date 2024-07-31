@@ -1,5 +1,4 @@
-import { Schema, Types, model, models } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
+import { Schema, model, models } from 'mongoose';
 import EntryAnalysisModel from './EntryAnalysis';
 
 export enum JOURNAL_ENTRY_TYPES {
@@ -9,21 +8,15 @@ export enum JOURNAL_ENTRY_TYPES {
 }
 
 interface JournalEntryType extends Document {
-    id: string,
-    userId: Types.ObjectId,
+    userId: Schema.Types.ObjectId,
     createdAt: Date,
     updatedAt: Date,
     content: string,
     status: JOURNAL_ENTRY_TYPES,
-    analysis?: Types.ObjectId,
+    analysis?: Schema.Types.ObjectId,
 }
 
 const JournalEntrySchema = new Schema<JournalEntryType>({
-    id: {
-        type: String,
-        default: uuidv4,
-        unique: true,
-    },
     userId: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -47,7 +40,7 @@ const JournalEntrySchema = new Schema<JournalEntryType>({
         enum: Object.values(JOURNAL_ENTRY_TYPES),
     },
     analysis: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'EntryAnalysis',
     }
 })

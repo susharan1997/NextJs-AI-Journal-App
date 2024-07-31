@@ -72,7 +72,7 @@ const DropdownComponent: React.FC = () => {
         </UserProfileIcon>
       </DropdownButton>
       <DropdownContent isOpen={isOpen} aria-hidden={!isOpen}>
-        <DropdownItem onClick={handleSignUp}>Sign Up</DropdownItem>
+        <DropdownItem onClick={handleSignUp}>Sign out</DropdownItem>
       </DropdownContent>
     </DropdownContainer>
   );

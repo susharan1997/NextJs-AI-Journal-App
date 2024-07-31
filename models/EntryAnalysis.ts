@@ -1,14 +1,12 @@
-import { Schema, Types, model, models } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
+import { Schema, model, models } from 'mongoose';
 import JournalEntry from './JournalEntry'
 import User from './User';
 
 interface EntryAnalysisType extends Document {
-    id: string,
     createdAt: Date,
     updatedAt: Date,
-    entryId: Types.ObjectId,
-    userId: Types.ObjectId,
+    entryId: Schema.Types.ObjectId,
+    userId: Schema.Types.ObjectId,
     mood: string,
     subject: string,
     negative: boolean,
@@ -18,11 +16,6 @@ interface EntryAnalysisType extends Document {
 }
 
 const entryAnalysysSchema = new Schema<EntryAnalysisType>({
-    id: {
-        type: String,
-        default: uuidv4,
-        unique: true,
-    },
     createdAt: {
         type: Date,
         default: Date.now,

@@ -23,7 +23,7 @@ align-items: center;
 `;
 
 const Title = styled.h1`
-font-size: 1.5em;
+font-size: 1.8em;
 margin: 0;
 `;
 

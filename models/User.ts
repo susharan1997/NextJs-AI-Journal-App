@@ -1,25 +1,18 @@
-import { Schema, Document, Types, model, models } from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
+import { Schema, Document, model, models } from 'mongoose';
 import EntryAnalysisModel from './EntryAnalysis';
 
 interface UserType extends Document {
-    id: string;
     email: string;
     password: string;
     name: string;
     createdAt: Date;
     updatedAt: Date;
-    account?: Types.ObjectId;
-    entries?: Types.ObjectId[];
-    analysis?: Types.ObjectId[];
+    account?: Schema.Types.ObjectId;
+    entries?: Schema.Types.ObjectId[];
+    analysis?: Schema.Types.ObjectId[];
 }
 
 const userSchema = new Schema<UserType>({
-    id: {
-        type: String,
-        default: uuidv4,
-        unique: true,
-    },
     email: {
         type: String,
         unique: true,
@@ -41,7 +34,7 @@ const userSchema = new Schema<UserType>({
         default: Date.now,
     },
     account: {
-        type: String,
+        type: Schema.Types.ObjectId,
         ref: 'Account',
     },
     entries: [{

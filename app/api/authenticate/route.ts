@@ -4,9 +4,8 @@ import UserModel from "@/models/User";
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
-    await dbConnect();
-    try {
-
+    try {  
+        await dbConnect();
         const { email, password } = await req.json();
 
         if (!email || !password) {
