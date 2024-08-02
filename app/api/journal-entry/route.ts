@@ -4,6 +4,7 @@ import UserModel from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongoose";
 import mongoose from "mongoose";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest){
     try {
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest){
         }
 
         const user = await UserModel.findById(userId);
-
+        
         if (!user) {
             return NextResponse.json({ error: `User not found! ${user}` }, { status: 404 });
         }
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest){
             mood: 'Neutral',
             subject: 'None',
             negative: false,
-            summary: 'None',
+            summary: 'Summary',
             sentimentScore: 0,
             color: '#0101fe',
             userId: user._id,
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest){
 
         user.entries.push(newJournalEntry._id);
         await user.save();
+        revalidatePath('/journal');
 
         return NextResponse.json({ data: newJournalEntry }, { status: 200 });
     }

@@ -2,6 +2,7 @@
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation'
 import { newEntry } from '@/utils/api';
+import { useEffect } from 'react';
 
 const Container = styled.div`
   cursor: pointer;
@@ -9,6 +10,9 @@ const Container = styled.div`
   border-radius: 0.75rem;
   background-color: white;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  width: 150px;
+  margin: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 const Content = styled.div`
@@ -19,7 +23,7 @@ const Content = styled.div`
 `;
 
 const Title = styled.span`
-  font-size: 1.875rem;
+  font-size: 1.2rem;
 `;
 
 const NewJournalEntryComponent = () => {
@@ -27,7 +31,13 @@ const NewJournalEntryComponent = () => {
 
     const handleOnClick = async () => {
         const {data} = await newEntry();
-        router.push(`/journal/${data.id}`);
+        if(data){
+          router.push(`/journal/${data.id}`);
+        }
+        else{
+          console.log(`Invalid data response: ${data}`);
+          throw new Error('Invalid data response!');
+        }
     }
 
     return (

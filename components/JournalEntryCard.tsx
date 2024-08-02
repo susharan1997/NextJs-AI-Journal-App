@@ -7,7 +7,8 @@ const Card = styled.div`
   border-radius: 0.5rem;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  width: 300px;
+  margin: 10px;
 `;
 
 const Divider = styled.div`
@@ -34,8 +35,7 @@ const Section = styled.div`
 `;
 
 const JournalEntryCard = ({entry}: any) => {
-    console.log(entry);
-    const date = new Date(entry?.createdAt).toDateString();
+    const date = new Date(entry?.createdAt).toLocaleString();
     return (
         <Card>
             <Section>{date}</Section>

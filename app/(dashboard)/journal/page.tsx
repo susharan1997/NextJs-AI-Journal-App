@@ -5,9 +5,18 @@ import { useSearchParams } from 'next/navigation';
 import NewJournalEntryComponent from '@/components/NewJournalEntryComponent';
 import JournalEntryCard from '@/components/JournalEntryCard';
 import styled from 'styled-components';
+import Link from 'next/link';
 
 const JournalsContainer = styled.div`
-    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    max-height: 75%;
+    border: 1px solid grey;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+    border-radius: 0.5rem;
+    margin-left: 10px;
 `;
 
 const Title = styled.h2`
@@ -24,7 +33,7 @@ function JournalComponent() {
     const [showBanner, setShowBanner] = useState(false);
     const [entries, setEntries] = useState<any[]>([]);
     const [userData, setUserData] = useState<any>(null);
-    const searchParams = useSearchParams();
+    console.log(entries.map(entry => typeof entry?.analysis?._id), 'JOURNAL ENTRIES -> /journal page');
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -63,18 +72,20 @@ function JournalComponent() {
             localStorage.setItem('hasShownBanner', 'true');
             setTimeout(() => setShowBanner(false), 3000);
         }
-    }, [searchParams, userData]);
+    }, [userData]);
 
     return (
         <>
             <Banner message={message || ''} show={showBanner} />
+            <Title>
+                Journals
+            </Title>
+            <NewJournalEntryComponent />
             <JournalsContainer>
-                <Title>
-                    Journals
-                </Title>
-                <NewJournalEntryComponent />
-                {Array.isArray(entries) && entries.map(journal => (
-                    <JournalEntryCard key={journal._id} entry={journal} />
+                {Array.isArray(entries) && entries.map((journal, index) => (
+                    <Link href={`/journal/${journal?.analysis?._id}`} key={index}>
+                        <JournalEntryCard key={journal?.analysis?._id} entry={journal} />
+                    </Link>
                 ))}
             </JournalsContainer>
         </>
