@@ -2,7 +2,7 @@
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation'
 import { newEntry } from '@/utils/api';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const Container = styled.div`
   cursor: pointer;
@@ -27,26 +27,44 @@ const Title = styled.span`
 `;
 
 const NewJournalEntryComponent = () => {
-    const router = useRouter();
 
-    const handleOnClick = async () => {
-        const {data} = await newEntry();
-        if(data){
-          router.push(`/journal/${data.id}`);
-        }
-        else{
-          console.log(`Invalid data response: ${data}`);
-          throw new Error('Invalid data response!');
-        }
+  const [parsedUserData, setParsedUserData] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const user = localStorage.getItem('user');
+      const parsedUser = user ? JSON.parse(user) : null;
+      setParsedUserData(parsedUser);
+    }
+  }, []);
+
+  const handleOnClick = async () => {
+    if (!parsedUserData) {
+      console.log('User data not available');
+      return;
     }
 
-    return (
-      <Container onClick={handleOnClick}>
-        <Content>
-          <Title>New Entry</Title>
-        </Content>
-      </Container>
-    );
+    try {
+      const data = await newEntry(parsedUserData.id);
+      if (data?._id) {
+        router.push(`/journal/${data._id}`);
+      } else {
+        console.log(`Invalid data response: ${data}`);
+        throw new Error('Invalid data response!');
+      }
+    } catch (error) {
+      console.error(`Error creating new entry: ${error}`);
+    }
   };
-  
-  export default NewJournalEntryComponent;
+
+  return (
+    <Container onClick={handleOnClick}>
+      <Content>
+        <Title>New Entry</Title>
+      </Content>
+    </Container>
+  );
+};
+
+export default NewJournalEntryComponent;

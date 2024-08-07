@@ -1,11 +1,10 @@
 'use client';
-import JournalEntryModel from "@/models/JournalEntry";
+import JournalEditor from '@/components/JournalEditor';
 import { NextPage } from 'next';
-//import JournalEditor from "@/components/JournalEditor";
 import { useEffect, useState } from "react";
 
 const JournalPageComponent: NextPage<{ params: any }> = ({ params }) => {
-    const [entry, setEntry] = useState<any>(null);
+    const [entryAnalysis, setEntryAnalysis] = useState<any>(null);
     const [parsedUserData, setParsedUserData] = useState<any>(null);
 
     useEffect(() => {
@@ -18,7 +17,6 @@ const JournalPageComponent: NextPage<{ params: any }> = ({ params }) => {
 
     useEffect(() => {
         const journalId = params?.id;
-        console.log(params, 'JOURNAL ID -> journal/[id]');
         if (parsedUserData && journalId) {
             const fetchEntry = async () => {
                 try {
@@ -29,8 +27,8 @@ const JournalPageComponent: NextPage<{ params: any }> = ({ params }) => {
                         },
                         body: JSON.stringify(parsedUserData.id),
                     });
-                    const data = await response.json();
-                    setEntry(data.entry);
+                    const {entryAnalysis} = await response.json();
+                    setEntryAnalysis(entryAnalysis);
                 } catch (error) {
                     console.error('Error fetching journal entries:', error);
                 }
@@ -41,7 +39,7 @@ const JournalPageComponent: NextPage<{ params: any }> = ({ params }) => {
 
     return (
         <div>
-            {/* <JournalEditor journal={entry} /> */}
+            <JournalEditor journal={entryAnalysis} />
         </div>
     )
 };

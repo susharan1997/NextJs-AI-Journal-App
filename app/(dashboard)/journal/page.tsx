@@ -1,7 +1,6 @@
 'use client';
 import Banner from '@/components/Banner';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import NewJournalEntryComponent from '@/components/NewJournalEntryComponent';
 import JournalEntryCard from '@/components/JournalEntryCard';
 import styled from 'styled-components';
@@ -33,8 +32,6 @@ function JournalComponent() {
     const [showBanner, setShowBanner] = useState(false);
     const [entries, setEntries] = useState<any[]>([]);
     const [userData, setUserData] = useState<any>(null);
-    console.log(entries.map(entry => typeof entry?.analysis?._id), 'JOURNAL ENTRIES -> /journal page');
-
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const user = localStorage.getItem('user');
@@ -72,7 +69,7 @@ function JournalComponent() {
             localStorage.setItem('hasShownBanner', 'true');
             setTimeout(() => setShowBanner(false), 3000);
         }
-    }, [userData]);
+    }, [userData, setEntries]);
 
     return (
         <>
@@ -83,8 +80,8 @@ function JournalComponent() {
             <NewJournalEntryComponent />
             <JournalsContainer>
                 {Array.isArray(entries) && entries.map((journal, index) => (
-                    <Link href={`/journal/${journal?.analysis?._id}`} key={index}>
-                        <JournalEntryCard key={journal?.analysis?._id} entry={journal} />
+                    <Link href={`/journal/${journal?._id}`} key={index}>
+                        <JournalEntryCard key={journal?._id} entry={journal} />
                     </Link>
                 ))}
             </JournalsContainer>
