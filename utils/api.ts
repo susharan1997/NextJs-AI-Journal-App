@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect } from "react";
-
 export async function newEntry(userId: any) {
     if (userId) {
         const res = await fetch('/api/journal-entry', {
@@ -53,10 +51,43 @@ export const updateJournal = async (id: string, { content }: any) => {
         }
 
         const result = await res.json();
+        console.log(result, 'API RESULT');
         return result || {};
     }
     catch (error) {
         console.error('Error during updateJournal call:', error);
         return {};
     }
+}
+
+export const deleteJournal = async (id: string) => {
+    if(!id){
+        console.log(`Invalid journal Id: ${id}`);
+        return null;
+    }
+
+    const user = localStorage.getItem('user');
+    const parsedUser = user ? JSON.parse(user) : null;
+
+    try{
+        const res = await fetch(new Request(`/api/journal-entry/${id}`), {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: parsedUser?.id,
+            })
+        });
+
+        if(!res.ok){
+            throw new Error(`Response not OK: ${res.status}`);
+        }
+        return res.json();
+    }
+    catch(error){
+        console.error(`Error while deleting Journal entry: ${error}`);
+        return {};
+    }
+
 }

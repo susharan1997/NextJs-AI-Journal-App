@@ -5,17 +5,19 @@ import NewJournalEntryComponent from '@/components/NewJournalEntryComponent';
 import JournalEntryCard from '@/components/JournalEntryCard';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 const JournalsContainer = styled.div`
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
     overflow-y: auto;
     max-height: 75%;
     border: 1px solid grey;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
     border-radius: 0.5rem;
     margin-left: 10px;
+    padding: 10px;
 `;
 
 const Title = styled.h2`
@@ -32,6 +34,17 @@ function JournalComponent() {
     const [showBanner, setShowBanner] = useState(false);
     const [entries, setEntries] = useState<any[]>([]);
     const [userData, setUserData] = useState<any>(null);
+    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        const deletedId = searchParams.get('deleted');
+        if(deletedId){
+            setMessage(`Deleted the journal (${deletedId} successfully!)`);
+            setShowBanner(true);
+            setTimeout(() => setShowBanner(false), 3000);
+        }
+    }, [searchParams]);
+
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const user = localStorage.getItem('user');

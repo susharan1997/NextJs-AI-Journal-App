@@ -6,7 +6,7 @@ const DropdownContainer = styled.div`
   position: absolute;
   display: inline-block;
   right: 10px;
-  top: 10px;
+  top: 15px;
 `;
 
 const DropdownButton = styled.div`
@@ -23,6 +23,7 @@ const DropdownContent = styled.div.withConfig({
   min-width: 160px;
   z-index: 1;
   right: 0;
+  border-radius: 5px;
 `;
 
 const DropdownItem = styled.a`
@@ -30,9 +31,12 @@ const DropdownItem = styled.a`
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  cursor: pointer;
 
   &:hover {
     background-color: #ddd;
+    border-radius: 5px;
+    
   }
 `;
 

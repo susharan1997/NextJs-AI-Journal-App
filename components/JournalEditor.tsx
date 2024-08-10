@@ -1,9 +1,10 @@
-import { useRouter } from 'next/router';
+'use client';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAutosave } from 'react-autosave';
 import Spinner from './Spinner';
-import { updateJournal } from '@/utils/api';
+import { deleteJournal, updateJournal } from '@/utils/api';
 
 const Container = styled.div`
   width: 100%;
@@ -61,13 +62,14 @@ const DeleteButton = styled.button`
   padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
+  border-radius: 5px;
 `;
 
 const JournalEditor = ({ journal }: { journal: any }) => {
     const [text, setText] = useState('');
     const [currentJournal, setJournal] = useState<any>('');
     const [isSaving, setIsSaving] = useState(false);
-    //const router = useRouter();
+    const router = useRouter();
 
     useEffect(() => {
         const journalContent = journal?.entryId?.content ?? '';
@@ -76,8 +78,20 @@ const JournalEditor = ({ journal }: { journal: any }) => {
     }, [journal]);
 
     const handleDelete = async () => {
-        // await deleteJournal(journal.id);
-        // router.push('/journal');
+        try{
+            const { data } = await deleteJournal(journal?.entryId?._id);
+        if(data){
+            const url = new URL('/journal', window.location.origin);
+            url.searchParams.append('deleted', data.id);
+            router.push(url.toString());
+        }
+        else{
+            console.log('Journal not deleted!');
+        }
+        }
+        catch(error){
+            console.error('Error deleting journal:', error);
+        }
     };
 
     useAutosave({   
@@ -89,6 +103,7 @@ const JournalEditor = ({ journal }: { journal: any }) => {
             setIsSaving(true);
             const journalId = currentJournal?.entryId?._id;
             const res = await updateJournal(journalId, { content: _text });
+            console.log(res, 'UPDATED ENTRY');
             if (res && res.data) {
                 setJournal(res.data);
             }
@@ -131,7 +146,7 @@ const JournalEditor = ({ journal }: { journal: any }) => {
                         </div>
                     </AnalysisListItem>
                     <AnalysisListItem>
-                        <DeleteButton onClick={/*handleDelete*/() => console.log('Delete')}>Delete</DeleteButton>
+                        <DeleteButton onClick={handleDelete}>Delete</DeleteButton>
                     </AnalysisListItem>
                 </AnalysisList>
             </AnalysisContainer>

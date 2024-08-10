@@ -4,6 +4,7 @@ import JournalEntryModel from "@/models/JournalEntry";
 import { revalidatePath } from 'next/cache'
 import EntryAnalysisModel from "@/models/EntryAnalysis";
 import mongoose from 'mongoose';
+import {analyzeJournalEntry} from '../../../../utils/ai';
 
 export async function POST(req: NextRequest, { params }: any) {
     try {
@@ -66,10 +67,52 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             return NextResponse.json({ error: `Journal entry not found!: ${updateEntry} and userId-> ${userId} and journal content-> ${content} and journal ID-> ${journalId}` }, { status: 404 });
         }
 
-        return NextResponse.json({ data: updateEntry });
+        const journalEntryAnalysis = await analyzeJournalEntry(updateEntry);
+
+        const analyzedJournalEntry = await EntryAnalysisModel.findOneAndUpdate(
+            {entryId: journalId},
+            {...journalEntryAnalysis, userId: userId},
+            {
+                new: true,
+                upsert: true,
+                runValidators: true,
+            }
+        )
+
+        return NextResponse.json({ data: { ...updateEntry, analysis: analyzedJournalEntry} });
     }
     catch (error) {
         console.error(`Error while updating the journal entry: ${error}`);
-        return NextResponse.json({ error: `Internal server error: ${error} journalId-> ${params}` }, { status: 500 });
+        return NextResponse.json({ error: `Internal server error: ${error} journalId-> ${params.id}` }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+    try{
+        await dbConnect();
+
+        const { userId } = await req.json();
+        const journalId = params.id;
+
+        if(!userId || !journalId){
+            return NextResponse.json({error: `Invalid userId: ${userId} or journalId: ${journalId}`}, {status: 400});
+        }
+
+        const deleteEntry = await JournalEntryModel.findOneAndDelete({
+                _id: journalId,
+                userId: userId,
+        });
+
+        if(!deleteEntry){
+            return NextResponse.json({error: `Cannot find the journal entry to delete: ${deleteEntry}`}, {status: 404});
+        }
+
+        revalidatePath('/journal');
+        return NextResponse.json({data: {id: params.id}});
+
+    }
+    catch(error){
+        console.error(`Error while deleting the journal entry: ${error}`);
+        return NextResponse.json({error: `Internal server error`}, {status: 500});
     }
 }
