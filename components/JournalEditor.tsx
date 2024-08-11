@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { useAutosave } from 'react-autosave';
 import Spinner from './Spinner';
 import { deleteJournal, updateJournal } from '@/utils/api';
+import JournalContentSpinner from './JournalContentSpinner';
 
 const Container = styled.div`
   width: 100%;
@@ -66,53 +67,66 @@ const DeleteButton = styled.button`
 `;
 
 const JournalEditor = ({ journal }: { journal: any }) => {
-    const [text, setText] = useState('');
-    const [currentJournal, setJournal] = useState<any>('');
+    const [text, setText] = useState('New content');
+    const [currentJournal, setJournal] = useState<any>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const router = useRouter();
 
     useEffect(() => {
-        const journalContent = journal?.entryId?.content ?? '';
-        setText(journalContent);
-        setJournal(journal);
+        if (journal) {
+            const journalContent = journal?.entryId?.content ?? '';
+            setText(journalContent);
+            setJournal(journal);
+            setIsLoading(false);
+        }
     }, [journal]);
 
     const handleDelete = async () => {
-        try{
+        try {
             const { data } = await deleteJournal(journal?.entryId?._id);
-        if(data){
-            const url = new URL('/journal', window.location.origin);
-            url.searchParams.append('deleted', data.id);
-            router.push(url.toString());
+            if (data) {
+                const url = new URL('/journal', window.location.origin);
+                url.searchParams.append('deleted', data.id);
+                router.push(url.toString());
+            }
+            else {
+                console.log('Journal not deleted!');
+            }
         }
-        else{
-            console.log('Journal not deleted!');
-        }
-        }
-        catch(error){
+        catch (error) {
             console.error('Error deleting journal:', error);
         }
     };
 
-    useAutosave({   
-        data: text,
-        onSave: async (_text) => {
-            if (_text === journal?.entryId?.content)
-                return;
+    const handleJournalUpdate = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newText = e.target.value;
+        setText(newText);
+        setJournal(journal);
 
-            setIsSaving(true);
-            const journalId = currentJournal?.entryId?._id;
-            const res = await updateJournal(journalId, { content: _text });
-            console.log(res, 'UPDATED ENTRY');
+        if (newText === journal?.entryId?.content)
+            return;
+
+        setIsSaving(true);
+        const journalId = currentJournal?.entryId?._id;
+
+        try {
+            const res = await updateJournal(journalId, { content: newText });
+
             if (res && res.data) {
                 setJournal(res.data);
             }
-            else{
-                console.error('Failed to update journal or no data returned:', res)
+            else {
+                console.error('Failed to update journal or no data returned:', res);
             }
+        }
+        catch (error) {
+            console.error('Error updating journal:', error);
+        }
+        finally {
             setIsSaving(false);
         }
-    })
+    }
 
     return (
         <Container>
@@ -126,23 +140,29 @@ const JournalEditor = ({ journal }: { journal: any }) => {
                 )}
             </SpinnerContainer>
             <EditorContainer>
-                <TextArea value={text} onChange={(e) => setText(e.target.value)} />
+                {
+                    isLoading ? (
+                        <JournalContentSpinner />
+                    ) : (
+                        <TextArea value={text} onChange={handleJournalUpdate} />
+                    )
+                }
             </EditorContainer>
             <AnalysisContainer>
                 <AnalysisHeader>Analysis</AnalysisHeader>
                 <AnalysisList>
                     <AnalysisListItem>
                         <div>Subject</div>
-                        <div>{currentJournal?.subject}</div>
+                        <div>{currentJournal?.analysis?.subject ?? 'No Subject'}</div>
                     </AnalysisListItem>
                     <AnalysisListItem>
                         <div>Mood</div>
-                        <div>{currentJournal?.mood}</div>
+                        <div>{currentJournal?.analysis?.mood ?? 'No Mood'}</div>
                     </AnalysisListItem>
                     <AnalysisListItem>
                         <div>Negative</div>
                         <div>
-                            {currentJournal?.negative ? 'True' : 'False'}
+                            {currentJournal?.analysis?.negative ? 'True' : 'False'}
                         </div>
                     </AnalysisListItem>
                     <AnalysisListItem>

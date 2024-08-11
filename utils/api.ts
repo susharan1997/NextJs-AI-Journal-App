@@ -51,7 +51,6 @@ export const updateJournal = async (id: string, { content }: any) => {
         }
 
         const result = await res.json();
-        console.log(result, 'API RESULT');
         return result || {};
     }
     catch (error) {

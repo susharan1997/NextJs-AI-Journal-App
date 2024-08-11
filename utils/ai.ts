@@ -43,18 +43,25 @@ const getPrompt = async (content: any) => {
 export const analyzeJournalEntry = async (journal: any) => {
     const input = await getPrompt(journal.content);
     const model = new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'});
-    const output = await model.invoke(input);
-    const responseText = output.text || output;
 
     try{
-        return analysisParser.parse(output as any);
+        const output = await model.invoke(input);
+        const responseText = typeof output === 'string' ? output : output.text || '';
+
+        try{
+            return analysisParser.parse(responseText as any);
+        }
+        catch(e){
+            const fixedOutput = OutputFixingParser.fromLLM(
+                new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'}),
+                analysisParser,
+            )
+            const aiAnalyzedOutput = await fixedOutput.parse(responseText as any);
+            return aiAnalyzedOutput;
+        }
     }
-    catch(e){
-        const fixParser = OutputFixingParser.fromLLM(
-            new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'}),
-            analysisParser,
-        )
-        const fix = await fixParser.parse(output as any);
-        return fix;
+    catch(error){
+        console.error('Error analyzing journal entry:', error);
+        throw error;
     }
 }

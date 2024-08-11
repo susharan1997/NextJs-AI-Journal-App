@@ -77,7 +77,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
                 upsert: true,
                 runValidators: true,
             }
-        )
+        );
+
+        if (!analyzedJournalEntry) {
+            return NextResponse.json({ error: `Journal entry analysis from the AI model not updated!: ${analyzedJournalEntry} and userId-> ${userId} and journal content-> ${content} and journal ID-> ${journalId}` }, { status: 404 });
+        }
 
         return NextResponse.json({ data: { ...updateEntry, analysis: analyzedJournalEntry} });
     }
