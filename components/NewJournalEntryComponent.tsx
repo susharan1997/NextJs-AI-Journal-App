@@ -20,6 +20,10 @@ const Content = styled.div`
   @media (min-width: 640px) {
     padding: 1.5rem;
   }
+
+  &: hover {
+    background-color: #e9ecef;
+  }
 `;
 
 const Title = styled.span`

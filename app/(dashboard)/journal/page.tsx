@@ -6,18 +6,19 @@ import JournalEntryCard from '@/components/JournalEntryCard';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import Question from '../../../components/Question';
 
 const JournalsContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 10px;
+    gap: 5px;
     overflow-y: auto;
+    width: 95%;
     max-height: 75%;
     border: 1px solid grey;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
     border-radius: 0.5rem;
-    margin-left: 10px;
-    padding: 10px;
+    background-color: #004080;
 `;
 
 const Title = styled.h2`
@@ -90,6 +91,7 @@ function JournalComponent() {
             <Title>
                 Journals
             </Title>
+            <Question/>
             <NewJournalEntryComponent />
             <JournalsContainer>
                 {Array.isArray(entries) && entries.map((journal, index) => (

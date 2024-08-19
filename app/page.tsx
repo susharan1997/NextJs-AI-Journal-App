@@ -20,6 +20,7 @@ color: white;
 display: flex;
 justify-content: space-between;
 align-items: center;
+border: 2px solid red;
 `;
 
 const Title = styled.h1`

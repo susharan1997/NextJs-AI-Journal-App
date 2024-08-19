@@ -46,7 +46,7 @@ export const analyzeJournalEntry = async (journal: any) => {
 
     try{
         const output = await model.invoke(input);
-        const responseText = typeof output === 'string' ? output : output.text || '';
+        const responseText = typeof output === 'string' ? output : output.content || '';
 
         try{
             return analysisParser.parse(responseText as any);
@@ -64,4 +64,27 @@ export const analyzeJournalEntry = async (journal: any) => {
         console.error('Error analyzing journal entry:', error);
         throw error;
     }
+}
+
+export const qa = async (journals: any, question: string) => {
+    const docs = journals.map((journal: any) => 
+        new Document({
+            pageContent: journal.content,
+            metadata: {
+                source: journal._id,
+                date: journal.createdAt,
+            }
+        }))
+    
+    const model = new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'});
+    const chain = loadQARefineChain(model);
+    const embeddings = new OpenAIEmbeddings();
+    const store = await MemoryVectorStore.fromDocuments(docs, embeddings);
+    const relevantDocs = await store.similaritySearch(question);
+    const result = await chain.invoke({
+        input_documents: relevantDocs,
+        question,
+    });
+
+    return result.output_text;
 }

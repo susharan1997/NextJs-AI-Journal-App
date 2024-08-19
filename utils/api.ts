@@ -90,3 +90,36 @@ export const deleteJournal = async (id: string) => {
     }
 
 }
+
+export const askQuestion = async (question: string) => {
+    if(!question){
+        console.error('Invalid question:', question);
+        return null;
+    }
+
+    const user = localStorage.getItem('user');
+    const parsedUser = user ? JSON.parse(user) : null;
+
+    try{
+        const res = await fetch(new Request('/api/question'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                question,
+                userId: parsedUser?.id, 
+            })
+        });
+
+        if(!res.ok){
+            throw new Error(`Response not OK: ${res.status}`);
+        }
+
+        return res.json();
+    }
+    catch(error){
+        console.error('Error while computing question:', error);
+        return {};
+    }
+}

@@ -2,7 +2,6 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useAutosave } from 'react-autosave';
 import Spinner from './Spinner';
 import { deleteJournal, updateJournal } from '@/utils/api';
 import JournalContentSpinner from './JournalContentSpinner';
@@ -23,6 +22,12 @@ const SpinnerContainer = styled.div`
   padding: 2px;
 `;
 
+const TextSpinnerContainer = styled.div`
+    top: 50%;
+    left: 30%;
+    position: absolute;
+`;
+
 const EditorContainer = styled.div`
   grid-column: span 2;
 `;
@@ -38,9 +43,11 @@ const AnalysisContainer = styled.div`
   border-left: 1px solid #ccc;
 `;
 
-const AnalysisHeader = styled.h2`
+const AnalysisHeader = styled.h2.withConfig({
+    shouldForwardProp: (prop) => prop !== 'color',
+}) <{ color: string }>`
   font-size: 1.5rem;
-  background-color: #fff;
+  background-color: ${props => props.color};
   color: #000;
   padding: 1rem;
 `;
@@ -71,13 +78,24 @@ const JournalEditor = ({ journal }: { journal: any }) => {
     const [currentJournal, setJournal] = useState<any>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [analysis, setAnalysis] = useState<any>({
+        subject: '',
+        mood: '',
+        negative: false
+    });
     const router = useRouter();
+    const moodColor = currentJournal?.color;
 
     useEffect(() => {
         if (journal) {
             const journalContent = journal?.entryId?.content ?? '';
             setText(journalContent);
             setJournal(journal);
+            setAnalysis({
+                subject: journal?.subject ?? 'No Subject',
+                mood: journal?.mood ?? 'No Mood',
+                negative: journal?.negative ?? false,
+            })
             setIsLoading(false);
         }
     }, [journal]);
@@ -142,27 +160,30 @@ const JournalEditor = ({ journal }: { journal: any }) => {
             <EditorContainer>
                 {
                     isLoading ? (
-                        <JournalContentSpinner />
+                        <TextSpinnerContainer>
+                            <JournalContentSpinner />
+                        </TextSpinnerContainer>
+
                     ) : (
                         <TextArea value={text} onChange={handleJournalUpdate} />
                     )
                 }
             </EditorContainer>
             <AnalysisContainer>
-                <AnalysisHeader>Analysis</AnalysisHeader>
+                <AnalysisHeader color={moodColor ? moodColor : '#fff'}>Analysis</AnalysisHeader>
                 <AnalysisList>
                     <AnalysisListItem>
                         <div>Subject</div>
-                        <div>{currentJournal?.analysis?.subject ?? 'No Subject'}</div>
+                        <div>{analysis.subject}</div>
                     </AnalysisListItem>
                     <AnalysisListItem>
                         <div>Mood</div>
-                        <div>{currentJournal?.analysis?.mood ?? 'No Mood'}</div>
+                        <div>{analysis.mood}</div>
                     </AnalysisListItem>
                     <AnalysisListItem>
                         <div>Negative</div>
                         <div>
-                            {currentJournal?.analysis?.negative ? 'True' : 'False'}
+                            {analysis.negative}
                         </div>
                     </AnalysisListItem>
                     <AnalysisListItem>

@@ -17,11 +17,11 @@ export async function POST(req: NextRequest, { params }: any) {
             return NextResponse.json({ error: `Invalid or missing user Id: ${userId} or journal Id: ${params.id}` }, { status: 400 });
         }
 
-        const journalEntry = await JournalEntryModel.findOne({ userId: userId, _id: params.id }).exec();
+        // const journalEntry = await JournalEntryModel.findOne({ userId: userId, _id: params.id }).exec();
 
-        if (!journalEntry) {
-            return NextResponse.json({ error: `Invalid journal entry data: ${journalEntry} ${userId} ${params.id}` }, { status: 400 });
-        }
+        // if (!journalEntry) {
+        //     return NextResponse.json({ error: `Invalid journal entry data: ${journalEntry} ${userId} ${params.id}` }, { status: 400 });
+        // }
 
         const entryAnalysis = await EntryAnalysisModel.findOne({ entryId: params.id }).populate('entryId').exec();
 
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest, { params }: any) {
 
         revalidatePath('/journal');
 
-        return NextResponse.json({ journalEntry, entryAnalysis }, { status: 200 });
+        return NextResponse.json({ entryAnalysis }, { status: 200 });
     }
     catch (error) {
         console.log('Error in API route');

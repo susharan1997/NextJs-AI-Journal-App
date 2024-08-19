@@ -6,8 +6,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 
 const Container = styled.div`
   width: 100vw;
-  height: 100vh;
-  position: relative;
+  overflow-x: hidden;
 `;
 
 const Sidebar = styled.aside`
@@ -86,8 +85,8 @@ const UserTitle = styled.span`
   font-size: 1em;
   font-weight: bold;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #f3a683, #f7b731);
-  color: #333;
+  background: linear-gradient(135deg, #b3e0ff, #006994);
+  color: white;
   border-radius: 8px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
