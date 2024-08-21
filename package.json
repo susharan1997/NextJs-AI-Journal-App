@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.13.0",
     "babel-plugin-styled-components": "^2.1.4",
     "bcryptjs": "^2.4.3",
+    "jose": "^5.7.0",
     "langchain": "^0.2.14",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.1",

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
+import Banner from './Banner';
 
 const DropdownContainer = styled.div`
   position: absolute;
@@ -58,16 +59,35 @@ const UserProfileIcon = styled.div`
 
 const DropdownComponent: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [showBanner, setShowBanner] = useState(false);
   const router = useRouter();
 
   const handleToggle = () => setIsOpen(!isOpen);
 
-  const handleSignUp = () => {
-    router.push('/');
+  const handleLogout = async () => {
+    try{
+      const res = await fetch(new Request('/api/sign-out'), {
+        method: 'POST',
+      });
+
+      if(res.ok){
+        setMessage('Logout successful!');
+        setShowBanner(true);
+        setTimeout(() => setShowBanner(false), 3000);
+        router.push('/');
+      }
+      else{
+        throw new Error(`Response not OK: ${res.status}`);
+      }
+    }catch(error){
+      console.log('Error logging out', error);
+    }
   };
 
   return (
     <DropdownContainer>
+      <Banner message={message || ''} show={showBanner} />
       <DropdownButton onClick={handleToggle}>
         <UserProfileIcon>
           <svg viewBox="0 0 24 24">
@@ -76,7 +96,7 @@ const DropdownComponent: React.FC = () => {
         </UserProfileIcon>
       </DropdownButton>
       <DropdownContent isOpen={isOpen} aria-hidden={!isOpen}>
-        <DropdownItem onClick={handleSignUp}>Sign out</DropdownItem>
+        <DropdownItem onClick={handleLogout}>Sign out</DropdownItem>
       </DropdownContent>
     </DropdownContainer>
   );

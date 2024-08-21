@@ -17,6 +17,7 @@ const Container = styled.div`
 
 const Content = styled.div`
   padding: 1.25rem;
+  transition: background-color 0.3s ease;
   @media (min-width: 640px) {
     padding: 1.5rem;
   }

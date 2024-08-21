@@ -42,6 +42,7 @@ const Section = styled.div.withConfig({
 
 const SummarySection = styled.div`
   display: flex;
+  padding: 0 5px;
   align-items: center;
   justify-content: center;
   min-height: 100px;

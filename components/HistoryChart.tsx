@@ -4,8 +4,8 @@ import JournalContentSpinner from './JournalContentSpinner';
 
 const TooltipContainer = styled.div`
   padding: 2rem;
-  width: 100px;
-  height: 170px;
+  width: 150px;
+  height: 100px;
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -20,20 +20,27 @@ const ColorIndicator = styled.div.withConfig({
   position: absolute;
   left: 0.5rem;
   top: 0.5rem;
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.8rem;
+  height: 0.8rem;
   border-radius: 50%;
   background: ${props => props.color};
 `;
 
 const DateLabel = styled.p`
+  width: 140px;
+  margin-top: 10px;
+  text-align: center;
   font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.3);
+  color: rgba(0, 0, 0, 0.7);
 `;
 
 const MoodText = styled.p`
-  font-size: 1rem;
+  width: 140px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.8rem;
   text-transform: uppercase;
+  font-weight: bold;
 `;
 
 const SpinnerContainer = styled(JournalContentSpinner)`

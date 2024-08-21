@@ -1,5 +1,6 @@
 import { Schema, model, models } from 'mongoose';
 import EntryAnalysisModel from './EntryAnalysis';
+import UserModel from './User';
 
 export enum JOURNAL_ENTRY_TYPES {
     DRAFT = 'DRAFT',
@@ -52,12 +53,6 @@ JournalEntrySchema.pre('save', function (next) {
     this.updatedAt = new Date();
     next();
 });
-
-// JournalEntrySchema.pre('findOneAndDelete', async function(next: Function) {
-//     const entryId = this.getQuery()['_id'];
-//     await EntryAnalysisModel.deleteMany({ entryId });
-//     next();
-// });
 
 const JournalEntryModel = models.JournalEntry || model<JournalEntryType>('JournalEntry', JournalEntrySchema);
 export default JournalEntryModel;

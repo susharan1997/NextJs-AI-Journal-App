@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import EntryAnalysisModel from "@/models/EntryAnalysis";
 import mongoose from 'mongoose';
 import {analyzeJournalEntry} from '../../../../utils/ai';
+import UserModel from '@/models/User';
 
 export async function POST(req: NextRequest, { params }: any) {
     try {
@@ -110,6 +111,14 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         if(!deleteEntry){
             return NextResponse.json({error: `Cannot find the journal entry to delete: ${deleteEntry}`}, {status: 404});
         }
+
+        if(deleteEntry.analysis){
+            await EntryAnalysisModel.findByIdAndDelete(deleteEntry.analysis);
+        }
+
+        await UserModel.findByIdAndUpdate(userId, {
+            $pull: {entries: journalId, analysis: deleteEntry.analysis}
+        })
 
         revalidatePath('/journal');
         return NextResponse.json({data: {id: params.id}});

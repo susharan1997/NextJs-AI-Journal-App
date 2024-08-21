@@ -22,7 +22,7 @@ const InputContainer = styled.input`
 `;
 
 const Button = styled.button`
-  background-color: #80b3ff;
+  background-color: #61bbf2;
   color: #fff;
   border: none;
   padding: 0.5rem 1rem;
@@ -30,9 +30,10 @@ const Button = styled.button`
   cursor: pointer;
   border-radius: 5px;
   margin-left: 2px;
+  transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #006994;
+    background-color: #0769a6;
   }
 `;
 

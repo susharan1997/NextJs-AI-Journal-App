@@ -43,6 +43,7 @@ export async function POST(req: NextRequest){
         await newJournalEntry.save();
 
         user.entries.push(newJournalEntry._id);
+        user.analysis.push(newEntryAnalysis._id);
         await user.save();
         revalidatePath('/journal');
 

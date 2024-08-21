@@ -76,11 +76,5 @@ JournalEntry.schema.pre('findOneAndDelete', async function(next: Function){
     await EntryAnalysisModel.deleteMany({ entryId });
 });
 
-// User.schema.pre('findOneAndDelete', async function (next: Function) {
-//     const userId = this.getQuery()['_id'];
-//     await EntryAnalysisModel.deleteMany({ userId });
-//     next();
-//   });
-
 const EntryAnalysisModel = models.EntryAnalysis || model<EntryAnalysisType>('EntryAnalysis', entryAnalysysSchema);
 export default EntryAnalysisModel;
