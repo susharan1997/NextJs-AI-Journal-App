@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongoose";
 import JournalEntryModel from "@/models/JournalEntry";
 import { qa } from "@/utils/ai";
+import QuestionModel from '../../../models/Question';
 
 export async function POST(req: NextRequest){
     try{
@@ -24,9 +25,17 @@ export async function POST(req: NextRequest){
 
         const aiSolution = await qa(journalEntries, question);
 
+        const newQuestion = new QuestionModel({
+            question: question,
+            answer: aiSolution,
+            userId: userId,
+        });
+
+        await newQuestion.save();
+
         return NextResponse.json({ data: aiSolution }, {status: 200});
     }
     catch(error){
-        return NextResponse.json({error: 'Internal server error'}, {status: 500});
+        return NextResponse.json({error: `Internal server error: ${error}`}, {status: 500});
     }
 }

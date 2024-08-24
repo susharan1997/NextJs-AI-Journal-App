@@ -66,6 +66,18 @@ export const analyzeJournalEntry = async (journal: any) => {
     }
 }
 
+const refinedPrompt = `
+You are an AI assistant that helps answer questions based on a user's journal entries. These entries may contain reflections, thoughts, and experiences. 
+Please consider the context of all entries provided and answer the question as thoroughly as possible. 
+
+Here are some relevant journal entries:
+{relevantEntries}
+
+Question: {question}
+
+Answer:
+`;
+
 export const qa = async (journals: any, question: string) => {
     const docs = journals.map((journal: any) => 
         new Document({
@@ -74,16 +86,17 @@ export const qa = async (journals: any, question: string) => {
                 source: journal._id,
                 date: journal.createdAt,
             }
-        }))
+        }));
     
     const model = new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'});
     const chain = loadQARefineChain(model);
     const embeddings = new OpenAIEmbeddings();
     const store = await MemoryVectorStore.fromDocuments(docs, embeddings);
     const relevantDocs = await store.similaritySearch(question);
+    const relevantEntries = relevantDocs.map(doc => doc.pageContent).join("\n\n");
     const result = await chain.invoke({
         input_documents: relevantDocs,
-        question,
+        question: refinedPrompt.replace("{relevantEntries}", relevantEntries).replace("{question}", question),
     });
 
     return result.output_text;

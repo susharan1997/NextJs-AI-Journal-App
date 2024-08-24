@@ -2,6 +2,7 @@
 import { askQuestion } from '@/utils/api';
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import JournalContentSpinner from './JournalContentSpinner';
 
 const Form = styled.form`
     margin-top: 30px;
@@ -48,6 +49,12 @@ const AnswerContainer = styled.div`
     overflow-y: auto;
 `;
 
+const TextSpinnerContainer = styled(JournalContentSpinner)`
+    top: 45%;
+    left: 55%;
+    position: absolute;
+`;
+
 const Question = () => {
     const [question, setQuestion] = useState<string>('');
     const [answer, setAnswer] = useState<string>('');
@@ -56,31 +63,44 @@ const Question = () => {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         setLoading(true);
+        setAnswer('');
 
-        const { data } = await askQuestion(question);
-        if (data) {
-            setAnswer(data);
-            setLoading(false);
-            setQuestion('');
+        try {
+            const { data } = await askQuestion(question);
+            if (data) {
+                setAnswer(data);
+            }
+            else {
+                console.error('Something went wrong!', data);
+            }
         }
-        else {
-            console.error('Something went wrong!', data);
+        catch (error) {
+            console.error('Error while fetching the questions!', error);
+        }
+        finally {
+            setLoading(false);
         }
     }
 
     return (
         <QaContainer>
             <Form onSubmit={handleSubmit}>
-                <InputContainer type='text' onChange={(e) => setQuestion(e.target.value)} value={question} disabled={loading} placeholder='Ask a question...' />
+                <InputContainer type='text' onChange={(e) => setQuestion(e.target.value)} value={question} disabled={loading} placeholder='Ask a question related to a journal...' />
                 <Button type='submit' disabled={loading} >Ask</Button>
             </Form>
-            {true &&
-                (<AnswerContainer>
-                    <p>
-                        {answer}
-                    </p>
-                </AnswerContainer>)
-            }
+            <AnswerContainer>
+                {(loading || answer) && (
+                    <AnswerContainer>
+                        {loading ? (
+                            <TextSpinnerContainer>
+                                <JournalContentSpinner />
+                            </TextSpinnerContainer>
+                        ) : (
+                            <p>{answer}</p>
+                        )}
+                    </AnswerContainer>
+                )}
+            </AnswerContainer>
         </QaContainer>
     )
 }

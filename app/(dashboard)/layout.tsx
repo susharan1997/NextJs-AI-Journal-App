@@ -100,8 +100,12 @@ const links = [
     href: '/journal',
   },
   {
-    name: 'History',
+    name: 'Graph Analysis',
     href: '/history',
+  },
+  {
+    name: 'Questions',
+    href: '/previous-questions',
   }
 ]
 

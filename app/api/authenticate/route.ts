@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         const token = await new SignJWT({id: user.id, name: user.name})
         .setProtectedHeader({alg: 'HS256'})
         .setIssuedAt()
-        .setExpirationTime('1m')
+        .setExpirationTime('10m')
         .sign(SECRET_KEY);
 
         const userData = {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             path: '/',
-            maxAge: 60,
+            maxAge: 600,
         });
 
         return response;
