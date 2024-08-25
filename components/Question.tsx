@@ -47,12 +47,21 @@ const AnswerContainer = styled.div`
     height: auto;
     max-height: 200px;
     overflow-y: auto;
+    border-radius: 1em;
 `;
 
 const TextSpinnerContainer = styled(JournalContentSpinner)`
     top: 45%;
     left: 55%;
     position: absolute;
+`;
+
+const TextPara = styled.p`
+    text-align: justify;
+    text-justify: inter-word;
+    background-color: white;
+    border-radius: 1em;
+    padding: 10px;
 `;
 
 const Question = () => {
@@ -96,7 +105,7 @@ const Question = () => {
                                 <JournalContentSpinner />
                             </TextSpinnerContainer>
                         ) : (
-                            <p>{answer}</p>
+                            <TextPara>{answer}</TextPara>
                         )}
                     </AnswerContainer>
                 )}

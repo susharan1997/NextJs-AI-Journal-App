@@ -25,9 +25,3 @@ export async function POST(req: NextRequest){
         return NextResponse.json({error: 'Internal server error'}, {status: 500});
     }
 }
-
-// const newQa = new QuestionModel({
-//     question,
-//     aiSolution,
-// });
-// await newQa.save();

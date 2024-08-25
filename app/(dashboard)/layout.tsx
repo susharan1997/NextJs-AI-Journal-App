@@ -17,10 +17,12 @@ const Sidebar = styled.aside`
   width: 220px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Logo = styled.div`
-  padding: 16px;
   margin: 16px 0;
   font-size: 24px;  
   font-weight: bold;
@@ -55,12 +57,12 @@ const Header = styled.header`
   height: 70px;
   width: calc(100vw - 220px);
   border-bottom: 3px solid #e0e0e0;
-  background: linear-gradient(135deg, #ffffff, #e9ecef);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding: 0 30px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #282c34;
 `;
 
 const Nav = styled.nav`

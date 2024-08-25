@@ -4,10 +4,8 @@ import { useRouter } from 'next/navigation';
 import Banner from './Banner';
 
 const DropdownContainer = styled.div`
-  position: absolute;
   display: inline-block;
-  right: 10px;
-  top: 15px;
+  position: relative;
 `;
 
 const DropdownButton = styled.div`
@@ -23,6 +21,7 @@ const DropdownContent = styled.div.withConfig({
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   min-width: 160px;
   z-index: 1;
+  top: 120%;
   right: 0;
   border-radius: 5px;
 `;

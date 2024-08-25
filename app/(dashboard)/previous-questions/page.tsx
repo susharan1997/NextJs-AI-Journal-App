@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import QaDropdownComponent from "@/components/QaDropdownComponent";
+import JournalContentSpinner from "@/components/JournalContentSpinner";
 
 const QuestionsContainer = styled.div`
   width: 100%;
@@ -26,9 +27,16 @@ const EmptyText = styled.span`
     margin-bottom: 17%;
 `;
 
+const TextSpinnerContainer = styled(JournalContentSpinner)`
+    top: 45%;
+    left: 55%;
+    position: absolute;
+`;
+
 function previousQuestions() {
     const [qaData, setQaData] = useState<any>([]);
     const [userData, setUserData] = useState<any>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -54,6 +62,9 @@ function previousQuestions() {
                 } catch (error) {
                     console.error('Error fetching previous questions:', error);
                 }
+                finally{
+                    setLoading(false);
+                }
             }
         };
 
@@ -65,14 +76,19 @@ function previousQuestions() {
             <Text>
                 Previously asked questions:-
             </Text>
-            {
-                !qaData.length ?
+            {loading ? (
+                <TextSpinnerContainer>
+                    <JournalContentSpinner />
+                </TextSpinnerContainer>
+            ) : (
+                !qaData.length ? (
                     <EmptyText>
                         No Questions found!
                     </EmptyText>
-                    :
+                ) : (
                     <QaDropdownComponent data={qaData} />
-            }
+                )
+            )}
         </QuestionsContainer>
     )
 }

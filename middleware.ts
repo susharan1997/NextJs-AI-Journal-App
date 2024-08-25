@@ -4,11 +4,6 @@ import { jwtVerify } from 'jose';
 const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
 const isAuthenticated = async (req: NextRequest) => {
-    // const userEmail = req.cookies.get('email')?.value;
-    // const userPassword = req.cookies.get('password')?.value;
-    // console.log(userEmail, userPassword, 'USER DETAILS');
-
-    //return !!userEmail && !!userPassword;
     const token = req.cookies.get('auth-token')?.value;
 
     if(!token)

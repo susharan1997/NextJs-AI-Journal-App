@@ -85,6 +85,49 @@ const PropertiesText = styled.div`
     font-weight: bold;
 `;
 
+const DialogOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const DialogBox = styled.div`
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+`;
+
+const DialogButton = styled.button`
+  background-color: #f54556;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 0.5rem;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #b80214;
+  }
+`;
+
+const CancelButton = styled(DialogButton)`
+  background-color: #ccc;
+  &:hover {
+    background-color: #aaa;
+  }
+`;
+
 const JournalEditor = ({ journal }: { journal: any }) => {
     const [text, setText] = useState('New content');
     const [currentJournal, setJournal] = useState<any>(null);
@@ -97,6 +140,7 @@ const JournalEditor = ({ journal }: { journal: any }) => {
         mood: '',
         negative: false,
     });
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const router = useRouter();
     const moodColor = currentJournal?.color;
 
@@ -120,7 +164,7 @@ const JournalEditor = ({ journal }: { journal: any }) => {
             if (data) {
                 const url = new URL('/journal', window.location.origin);
                 url.searchParams.append('deleted', data.id);
-                router.push(url.toString());
+                router.replace(url.toString());
             }
             else {
                 console.log('Journal not deleted!');
@@ -129,6 +173,19 @@ const JournalEditor = ({ journal }: { journal: any }) => {
         catch (error) {
             console.error('Error deleting journal:', error);
         }
+    };
+
+    const handleDeleteClick = () => {
+        setIsDialogOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        setIsDialogOpen(false);
+        await handleDelete();
+    };
+
+    const handleCancelDelete = () => {
+        setIsDialogOpen(false);
     };
 
     const handleJournalUpdate = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -167,6 +224,15 @@ const JournalEditor = ({ journal }: { journal: any }) => {
     return (
         <Container>
             <Banner message={message || ''} show={showBanner} />
+            {isDialogOpen && (
+                <DialogOverlay>
+                    <DialogBox>
+                        <p>Are you sure?</p>
+                        <DialogButton onClick={handleConfirmDelete}>Yes</DialogButton>
+                        <CancelButton onClick={handleCancelDelete}>Cancel</CancelButton>
+                    </DialogBox>
+                </DialogOverlay>
+            )}
             <SpinnerContainer>
                 {isSaving ? (
                     <div role="status">
@@ -206,7 +272,7 @@ const JournalEditor = ({ journal }: { journal: any }) => {
                         </div>
                     </AnalysisListItem>
                     <AnalysisListItem>
-                        <DeleteButton onClick={handleDelete}>Delete</DeleteButton>
+                        <DeleteButton onClick={handleDeleteClick}>Delete</DeleteButton>
                     </AnalysisListItem>
                 </AnalysisList>
             </AnalysisContainer>

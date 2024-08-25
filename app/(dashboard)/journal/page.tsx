@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Question from '../../../components/Question';
+import { useRouter } from 'next/navigation';
 
 const JournalsContainer = styled.div`
     display: grid;
@@ -18,7 +19,7 @@ const JournalsContainer = styled.div`
     border: 1px solid grey;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
     border-radius: 0.5rem;
-    background-color: #004080;
+    background-color: #282c34;
 `;
 
 const Title = styled.h2`
@@ -36,12 +37,16 @@ function JournalComponent() {
     const [entries, setEntries] = useState<any[]>([]);
     const [userData, setUserData] = useState<any>(null);
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     useEffect(() => {
         const deletedId = searchParams.get('deleted');
         if(deletedId){
             setMessage(`Deleted the journal (${deletedId} successfully!)`);
             setShowBanner(true);
+            const url = new URL(window.location.href);
+            url.searchParams.delete('deleted');
+            router.replace(url.toString(), undefined);
             setTimeout(() => setShowBanner(false), 3000);
         }
     }, [searchParams]);

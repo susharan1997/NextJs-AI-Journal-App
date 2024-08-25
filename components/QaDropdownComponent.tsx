@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useDateFormat } from '@/utils/useDateFormat';
 
 interface QaType {
     question: string,
     answer: string,
+    createdAt: string,
 }
 
 interface QaDataType {
@@ -29,7 +31,6 @@ const Question = styled.div.withConfig({
   background-color: ${(props) => (props.isOpen ? '#f0f0f0' : '#e0e0e0')};
   padding: 15px;
   cursor: pointer;
-  font-weight: bold;
   transition: background-color 0.3s ease;
   border: 1px solid #808080;
 
@@ -42,6 +43,8 @@ const Answer = styled.div`
   background-color: #f9f9f9;
   padding: 15px;
   border-top: 1px solid #ccc;
+  text-align: justify;
+  text-justify: inter-word;
 `;
 
 const ArrowIcon = styled.svg.withConfig({
@@ -52,6 +55,24 @@ const ArrowIcon = styled.svg.withConfig({
   margin-left: 20px;
   transition: transform 0.3s ease;
   transform: ${(props) => (props.isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
+`;
+
+const DateSpan = styled.span`
+    font-size: 0.63em;
+`;
+
+const DateText = styled.span`
+    font-weight: bold;
+`;
+
+const QuestionText = styled.span`
+    font-weight: bold;
+`;
+
+const QuestionContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 `;
 
 const QaDropdownComponent: React.FC<QaDataType> = ({ data }) => {
@@ -67,7 +88,17 @@ const QaDropdownComponent: React.FC<QaDataType> = ({ data }) => {
                 data.map((qa, index) => (
                     <div key={index}>
                         <Question isOpen={openIndex === index} onClick={() => handleToggle(index)}>
-                            {qa.question}
+                            <QuestionContent>
+                                <DateSpan>
+                                    (created on -
+                                    <DateText>
+                                        {useDateFormat(qa.createdAt)})
+                                    </DateText>
+                                </DateSpan>
+                                <QuestionText>
+                                    {qa.question}
+                                </QuestionText>
+                            </QuestionContent>
                             <ArrowIcon
                                 isOpen={openIndex === index}
                                 xmlns="http://www.w3.org/2000/svg"
