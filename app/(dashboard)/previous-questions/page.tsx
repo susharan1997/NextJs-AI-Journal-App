@@ -33,7 +33,7 @@ const TextSpinnerContainer = styled(JournalContentSpinner)`
     position: absolute;
 `;
 
-function previousQuestions() {
+const PreviousQuestions: React.FC = () => {
     const [qaData, setQaData] = useState<any>([]);
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -93,4 +93,4 @@ function previousQuestions() {
     )
 }
 
-export default previousQuestions;
+export default PreviousQuestions;

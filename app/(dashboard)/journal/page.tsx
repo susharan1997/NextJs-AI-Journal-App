@@ -49,7 +49,7 @@ function JournalComponent() {
             router.replace(url.toString(), undefined);
             setTimeout(() => setShowBanner(false), 3000);
         }
-    }, [searchParams]);
+    }, [searchParams, router]);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {

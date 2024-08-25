@@ -85,14 +85,16 @@ const QaDropdownComponent: React.FC<QaDataType> = ({ data }) => {
     return (
         <QaDropdownContainer>
             {
-                data.map((qa, index) => (
-                    <div key={index}>
+                data.map((qa, index) => {
+                    const formattedDate = useDateFormat(qa.createdAt);
+                    return(
+                        <div key={index}>
                         <Question isOpen={openIndex === index} onClick={() => handleToggle(index)}>
                             <QuestionContent>
                                 <DateSpan>
                                     (created on -
                                     <DateText>
-                                        {useDateFormat(qa.createdAt)})
+                                        {formattedDate})
                                     </DateText>
                                 </DateSpan>
                                 <QuestionText>
@@ -119,7 +121,8 @@ const QaDropdownComponent: React.FC<QaDataType> = ({ data }) => {
                             </Answer>
                         }
                     </div>
-                ))
+                    )
+                })
             }
         </QaDropdownContainer>
     )
