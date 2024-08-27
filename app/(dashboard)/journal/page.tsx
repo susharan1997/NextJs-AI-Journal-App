@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Question from '../../../components/Question';
 import { useRouter } from 'next/navigation';
+import JournalContentSpinner from '../../../components/JournalContentSpinner';
 
 const JournalsContainer = styled.div`
     display: grid;
@@ -30,12 +31,19 @@ const Title = styled.h2`
   text-align: start;
 `;
 
+const StyledJournalContentSpinner = styled(JournalContentSpinner)`
+    position: absolute;
+    top: 50%;
+    left: 55%;
+`;
+
 
 function JournalComponent() {
     const [message, setMessage] = useState<string | null>(null);
     const [showBanner, setShowBanner] = useState(false);
     const [entries, setEntries] = useState<any[]>([]);
     const [userData, setUserData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -75,6 +83,9 @@ function JournalComponent() {
                 } catch (error) {
                     console.error('Error fetching journal entries:', error);
                 }
+                finally{
+                    setLoading(false);
+                }
             }
         };
 
@@ -89,6 +100,14 @@ function JournalComponent() {
             setTimeout(() => setShowBanner(false), 3000);
         }
     }, [userData, setEntries]);
+
+    if(loading){
+        return(
+            <StyledJournalContentSpinner>
+                <JournalContentSpinner/>
+            </StyledJournalContentSpinner>
+        )
+    }
 
     return (
         <>

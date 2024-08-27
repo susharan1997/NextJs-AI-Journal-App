@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useDateFormat } from '@/utils/useDateFormat';
+import { formattedData } from '../utils/useFormattedData';
 
-interface QaType {
+export interface QaType {
     question: string,
     answer: string,
     createdAt: string,
+    formattedDate?: string,
 }
 
 interface QaDataType {
@@ -77,6 +78,7 @@ const QuestionContent = styled.div`
 
 const QaDropdownComponent: React.FC<QaDataType> = ({ data }) => {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const UpdatedData = data && formattedData(data) || [];
 
     const handleToggle = (index: number) => {
         setOpenIndex(index === openIndex ? null : index);
@@ -85,16 +87,14 @@ const QaDropdownComponent: React.FC<QaDataType> = ({ data }) => {
     return (
         <QaDropdownContainer>
             {
-                data.map((qa, index) => {
-                    const formattedDate = useDateFormat(qa.createdAt);
-                    return(
-                        <div key={index}>
+                UpdatedData.map((qa, index) => (
+                    <div key={index}>
                         <Question isOpen={openIndex === index} onClick={() => handleToggle(index)}>
                             <QuestionContent>
                                 <DateSpan>
                                     (created on -
                                     <DateText>
-                                        {formattedDate})
+                                        {qa.formattedDate})
                                     </DateText>
                                 </DateSpan>
                                 <QuestionText>
@@ -121,8 +121,7 @@ const QaDropdownComponent: React.FC<QaDataType> = ({ data }) => {
                             </Answer>
                         }
                     </div>
-                    )
-                })
+                ))
             }
         </QaDropdownContainer>
     )
