@@ -1,6 +1,4 @@
 import { Schema, model, models } from 'mongoose';
-import EntryAnalysisModel from './EntryAnalysis';
-import UserModel from './User';
 
 export enum JOURNAL_ENTRY_TYPES {
     DRAFT = 'DRAFT',
@@ -8,7 +6,7 @@ export enum JOURNAL_ENTRY_TYPES {
     ARCHIVED = 'ARCHIVED',
 }
 
-interface JournalEntryType extends Document {
+export interface JournalEntryType extends Document {
     userId: Schema.Types.ObjectId,
     createdAt: Date,
     updatedAt: Date,

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation'
 import { newEntry } from '@/utils/api';
 import { useEffect, useState } from 'react';
+import { userDataType } from '@/types';
 
 const Container = styled.div`
   cursor: pointer;
@@ -33,7 +34,7 @@ const Title = styled.span`
 
 const NewJournalEntryComponent = () => {
 
-  const [parsedUserData, setParsedUserData] = useState<any>(null);
+  const [parsedUserData, setParsedUserData] = useState<userDataType | null>(null);
   const router = useRouter();
 
   useEffect(() => {

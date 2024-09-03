@@ -1,6 +1,6 @@
-import {QaType} from '../components/QaDropdownComponent';
+import { QaType } from '@/types';
 
-const formattedDate = (date: string) => {
+const formattedDate = (date: Date) => {
     const dateString = new Date(date);
 
     if(isNaN(dateString.getTime())){
@@ -23,7 +23,7 @@ const formattedDate = (date: string) => {
 }
 
 export const formattedData = (data: QaType[]): QaType[] => {
-    const updatedData = data.map(qa => ({
+    const updatedData = data.map((qa: QaType) => ({
         ...qa,
         formattedDate: formattedDate(qa.createdAt),
     }));

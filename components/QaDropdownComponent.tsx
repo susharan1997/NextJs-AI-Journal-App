@@ -1,13 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { formattedData } from '../utils/useFormattedData';
-
-export interface QaType {
-    question: string,
-    answer: string,
-    createdAt: string,
-    formattedDate?: string,
-}
+import { QaType } from '@/types';
 
 interface QaDataType {
     data: QaType[]

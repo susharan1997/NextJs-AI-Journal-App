@@ -1,8 +1,7 @@
 import { Schema, model, models } from 'mongoose';
 import JournalEntry from './JournalEntry'
-import User from './User';
 
-interface EntryAnalysisType extends Document {
+export interface EntryAnalysisType extends Document {
     createdAt: Date,
     updatedAt: Date,
     entryId: Schema.Types.ObjectId,

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import QaDropdownComponent from "@/components/QaDropdownComponent";
 import JournalContentSpinner from "@/components/JournalContentSpinner";
+import { QaType } from "../../../types";
+import { userDataType } from "../../../types";
 
 const QuestionsContainer = styled.div`
   width: 100%;
@@ -34,8 +36,8 @@ const TextSpinnerContainer = styled(JournalContentSpinner)`
 `;
 
 const PreviousQuestions: React.FC = () => {
-    const [qaData, setQaData] = useState<any>([]);
-    const [userData, setUserData] = useState<any>(null);
+    const [qaData, setQaData] = useState<QaType[]>([]);
+    const [userData, setUserData] = useState<userDataType | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -58,7 +60,12 @@ const PreviousQuestions: React.FC = () => {
                         body: JSON.stringify({ userId: userData.id })
                     });
                     const { data } = await response.json();
-                    setQaData(data);
+                    if(data){
+                        setQaData(data);
+                    }
+                    else{
+                        console.log('Invalid QA data!', data);
+                    }
                 } catch (error) {
                     console.error('Error fetching previous questions:', error);
                 }

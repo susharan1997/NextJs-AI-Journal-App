@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import styled from 'styled-components';
 
 const BannerContainer = styled.div.withConfig({shouldForwardProp: (prop) => prop!== 'show'})<{ show: boolean }>`

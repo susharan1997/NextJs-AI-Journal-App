@@ -1,6 +1,10 @@
 'use client';
 
-export async function newEntry(userId: any) {
+interface contentType {
+    content: string
+}
+
+export async function newEntry(userId: string) {
     if (userId) {
         const res = await fetch('/api/journal-entry', {
             method: 'POST',
@@ -25,7 +29,7 @@ export async function newEntry(userId: any) {
     }
 }
 
-export const updateJournal = async (id: string, { content }: any) => {
+export const updateJournal = async (id: string, { content }: contentType) => {
 
     if(!id){
         console.log(`Invalid journal id: ${id}`);

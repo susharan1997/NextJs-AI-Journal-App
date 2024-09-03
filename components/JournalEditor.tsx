@@ -6,6 +6,17 @@ import Spinner from './Spinner';
 import { deleteJournal, updateJournal } from '@/utils/api';
 import JournalContentSpinner from './JournalContentSpinner';
 import Banner from './Banner';
+import { EntryAnalysisType } from '@/types';
+
+interface journalEditorPropType {
+    journal: EntryAnalysisType | null
+}
+
+interface emotionTypes {
+    subject: string,
+    mood: string,
+    negative: boolean,
+}
 
 const Container = styled.div`
   width: 100%;
@@ -128,14 +139,14 @@ const CancelButton = styled(DialogButton)`
   }
 `;
 
-const JournalEditor = ({ journal }: { journal: any }) => {
+const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
     const [text, setText] = useState('New content');
-    const [currentJournal, setJournal] = useState<any>(null);
+    const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [message, setMessage] = useState<string | null>(null);
     const [showBanner, setShowBanner] = useState(false);
-    const [analysis, setAnalysis] = useState<any>({
+    const [analysis, setAnalysis] = useState<emotionTypes>({
         subject: '',
         mood: '',
         negative: false,
@@ -160,7 +171,8 @@ const JournalEditor = ({ journal }: { journal: any }) => {
 
     const handleDelete = async () => {
         try {
-            const { data } = await deleteJournal(journal?.entryId?._id);
+            if(journal?.entryId){
+                const { data } = await deleteJournal(journal?.entryId?._id);
             if (data) {
                 const url = new URL('/journal', window.location.origin);
                 url.searchParams.append('deleted', data.id);
@@ -168,6 +180,10 @@ const JournalEditor = ({ journal }: { journal: any }) => {
             }
             else {
                 console.log('Journal not deleted!');
+            }
+            }
+            else{
+                console.log('Invalid journal Id!');
             }
         }
         catch (error) {
@@ -189,7 +205,7 @@ const JournalEditor = ({ journal }: { journal: any }) => {
     };
 
     const handleJournalUpdate = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newText = e.target.value;
+        const newText = e.target.value as string;
         setText(newText);
         setJournal(journal);
 
@@ -198,6 +214,11 @@ const JournalEditor = ({ journal }: { journal: any }) => {
 
         setIsSaving(true);
         const journalId = currentJournal?.entryId?._id;
+
+        if(!journalId){
+            console.log('Invalid Journal Id!');
+            return;
+        }
 
         try {
             const res = await updateJournal(journalId, { content: newText });

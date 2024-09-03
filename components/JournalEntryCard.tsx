@@ -1,5 +1,10 @@
 'use client';
 import styled from 'styled-components';
+import { JournalEntryAnalysisType } from '@/types';
+
+interface JournalEntryCardProps {
+  entry: JournalEntryAnalysisType,
+}
 
 const Card = styled.div`
   display: flex;
@@ -20,7 +25,7 @@ const Divider = styled.div`
 
 const Section = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== 'color',
-}) <{ color: string }>`
+}) <{ color?: string }>`
   padding: 1.25rem;
   font-size: 12px;
   background-color: ${props => props.color};
@@ -55,15 +60,15 @@ const SummarySection = styled.div`
   text-align: center;
 `;
 
-const JournalEntryCard = ({entry}: any) => {
+const JournalEntryCard: React.FC<JournalEntryCardProps> = ({entry}) => {
     const date = new Date(entry?.createdAt).toLocaleString();
     return (
         <Card>
-            <Section color={entry?.analysis?.color}>{date}</Section>
+            <Section color={entry?.analysis?.color ?? '-'}>{date}</Section>
             <Divider />
-            <SummarySection>{entry?.analysis?.summary}</SummarySection>
+            <SummarySection>{entry?.analysis?.summary ?? '-'}</SummarySection>
             <Divider />
-            <Section color={''}>{entry?.analysis?.mood}</Section>
+            <Section>{entry?.analysis?.mood ?? '-'}</Section>
         </Card>
     )
 }

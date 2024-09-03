@@ -2,6 +2,8 @@
 import HistoryChart from '@/components/HistoryChart';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { userDataType } from '../../../types';
+import { EntryAnalysisType } from '../../../models/EntryAnalysis';
 
 const ChartContainer = styled.div`
     width: 100%;
@@ -11,9 +13,9 @@ const ScoreText = styled.span`
     font-weight: bold;
 `;
 
-const HistoryPage = () => {
-    const [parsedUserData, setParsedUserData] = useState<any>(null);
-    const [journalAnalysis, setJournalAnalysis] = useState<any>(null);
+const HistoryPage: React.FC = () => {
+    const [parsedUserData, setParsedUserData] = useState<userDataType | null>(null);
+    const [journalAnalysis, setJournalAnalysis] = useState<EntryAnalysisType[]>([]);
     const [average, setAverage] = useState<number>(0);
 
     useEffect(() => {

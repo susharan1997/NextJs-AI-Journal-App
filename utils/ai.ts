@@ -6,6 +6,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { StructuredOutputParser, OutputFixingParser } from 'langchain/output_parsers';
 import { Document } from 'langchain/document';
 import { z } from 'zod';
+import { JournalEntryType } from '@/types';
 
 
 const analysisParser = StructuredOutputParser.fromZodSchema(
@@ -25,7 +26,7 @@ const analysisParser = StructuredOutputParser.fromZodSchema(
     })
 )
 
-const getPrompt = async (content: any) => {
+const getPrompt = async (content: string) => {
     const formatInstructions = analysisParser.getFormatInstructions();
     const prompt = new PromptTemplate({
         template: 'Analyze the following journal entry. Follow the instrictions and format your response to match the format instructions, no matter what! \n{formatInstructions}\n{entry}',
@@ -40,7 +41,7 @@ const getPrompt = async (content: any) => {
     return input;
 }
 
-export const analyzeJournalEntry = async (journal: any) => {
+export const analyzeJournalEntry = async (journal: JournalEntryType) => {
     const input = await getPrompt(journal.content);
     const model = new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'});
 
@@ -49,14 +50,14 @@ export const analyzeJournalEntry = async (journal: any) => {
         const responseText = typeof output === 'string' ? output : output.content || '';
 
         try{
-            return analysisParser.parse(responseText as any);
+            return analysisParser.parse(responseText as string);
         }
         catch(e){
             const fixedOutput = OutputFixingParser.fromLLM(
                 new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'}),
                 analysisParser,
             )
-            const aiAnalyzedOutput = await fixedOutput.parse(responseText as any);
+            const aiAnalyzedOutput = await fixedOutput.parse(responseText as string);
             return aiAnalyzedOutput;
         }
     }
@@ -78,8 +79,8 @@ Question: {question}
 Answer:
 `;
 
-export const qa = async (journals: any, question: string) => {
-    const docs = journals.map((journal: any) => 
+export const qa = async (journals: JournalEntryType[], question: string) => {
+    const docs = journals.map((journal: JournalEntryType) => 
         new Document({
             pageContent: journal.content,
             metadata: {

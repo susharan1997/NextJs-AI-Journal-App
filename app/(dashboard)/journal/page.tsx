@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import Question from '../../../components/Question';
 import { useRouter } from 'next/navigation';
 import JournalContentSpinner from '../../../components/JournalContentSpinner';
+import { userDataType, JournalEntryAnalysisType } from '@/types';
 
 const JournalsContainer = styled.div`
     display: grid;
@@ -41,8 +42,8 @@ const StyledJournalContentSpinner = styled(JournalContentSpinner)`
 function JournalComponent() {
     const [message, setMessage] = useState<string | null>(null);
     const [showBanner, setShowBanner] = useState(false);
-    const [entries, setEntries] = useState<any[]>([]);
-    const [userData, setUserData] = useState<any>(null);
+    const [entries, setEntries] = useState<JournalEntryAnalysisType[] | null>([]);
+    const [userData, setUserData] = useState<userDataType | null>(null);
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -118,7 +119,7 @@ function JournalComponent() {
             <Question/>
             <NewJournalEntryComponent />
             <JournalsContainer>
-                {Array.isArray(entries) && entries.map((journal, index) => (
+                {Array.isArray(entries) && entries.map((journal: JournalEntryAnalysisType, index: number) => (
                     <Link href={`/journal/${journal?._id}`} key={index}>
                         <JournalEntryCard key={journal?._id} entry={journal} />
                     </Link>

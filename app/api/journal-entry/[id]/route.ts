@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import {analyzeJournalEntry} from '../../../../utils/ai';
 import UserModel from '@/models/User';
 
-export async function POST(req: NextRequest, { params }: any) {
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
     try {
         await dbConnect();
 
@@ -17,12 +17,6 @@ export async function POST(req: NextRequest, { params }: any) {
         if (!userId || !params.id) {
             return NextResponse.json({ error: `Invalid or missing user Id: ${userId} or journal Id: ${params.id}` }, { status: 400 });
         }
-
-        // const journalEntry = await JournalEntryModel.findOne({ userId: userId, _id: params.id }).exec();
-
-        // if (!journalEntry) {
-        //     return NextResponse.json({ error: `Invalid journal entry data: ${journalEntry} ${userId} ${params.id}` }, { status: 400 });
-        // }
 
         const entryAnalysis = await EntryAnalysisModel.findOne({ entryId: params.id }).populate('entryId').exec();
 

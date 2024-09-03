@@ -69,7 +69,7 @@ const Question = () => {
     const [answer, setAnswer] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setAnswer('');

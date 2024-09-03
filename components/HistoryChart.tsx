@@ -1,6 +1,17 @@
-import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, TooltipProps } from "recharts";
 import styled from "styled-components";
 import JournalContentSpinner from './JournalContentSpinner';
+import { EntryAnalysisType } from "@/types";
+
+interface HistoryChartProps {
+    data: EntryAnalysisType[] | null
+}
+
+interface CustomTooltipProps extends TooltipProps<number, string> {
+    payload?: { payload: EntryAnalysisType }[];
+    label?: string;
+    active?: boolean;
+}
 
 const TooltipContainer = styled.div`
   padding: 2rem;
@@ -55,8 +66,8 @@ const LineChartContainer = styled(LineChart)`
     margin: 30px;
 `;
 
-const CustomTooltip = ({ payload, label, active }: any) => {
-    const dateLabel = new Date(label).toLocaleString('en-us', {
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ payload, label, active }) => {
+    const dateLabel = new Date(label!).toLocaleString('en-us', {
         weekday: 'long',
         year: 'numeric',
         month: 'short',
@@ -83,7 +94,7 @@ const CustomTooltip = ({ payload, label, active }: any) => {
     return null;
 }
 
-const HistoryChart = ({ data }: any) => {
+const HistoryChart: React.FC<HistoryChartProps> = ({ data }) => {
     return (
         <>
             {data ?

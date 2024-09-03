@@ -1,5 +1,4 @@
 import { Schema, Document, model, models } from 'mongoose';
-import next from 'next';
 
 interface QuestionType extends Document {
     question: string;

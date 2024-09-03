@@ -2,10 +2,16 @@
 import JournalEditor from '@/components/JournalEditor';
 import { NextPage } from 'next';
 import { useEffect, useState } from "react";
+import { userDataType } from '@/types';
+import { EntryAnalysisType } from '@/types';
 
-const JournalPageComponent: NextPage<{ params: any }> = ({ params }) => {
-    const [entryAnalysis, setEntryAnalysis] = useState<any>(null);
-    const [parsedUserData, setParsedUserData] = useState<any>(null);
+interface paramsType {
+    id: string
+}
+
+const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
+    const [entryAnalysis, setEntryAnalysis] = useState<EntryAnalysisType | null>(null);
+    const [parsedUserData, setParsedUserData] = useState<userDataType | null>(null);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
