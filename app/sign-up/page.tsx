@@ -2,6 +2,8 @@
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { validationSchema } from './form';
 
 const SignUpContainer = styled.div`
   display: flex;
@@ -16,13 +18,13 @@ const Title = styled.h1`
   margin-bottom: 20px
 `;
 
-const Form = styled.form`
+const FormContainer = styled(Form)`
   display: flex;
   flex-direction: column;
   width: 300px;
 `;
 
-const Input = styled.input`
+const Input = styled(Field)`
   margin-bottom: 10px;
   padding: 10px;
   font-size: 1em;
@@ -50,17 +52,16 @@ const SignInLinkButton = styled.button`
   }
 `;
 
+const ErrorText = styled.div`
+  color: red;
+  margin-bottom: 10px;
+`;
+
 const SignUp = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const form = event.target as HTMLFormElement;
-    const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+  const handleSubmit = async (values: {name: string, email: string, password: string, retypePassword: string}) => {
 
     try {
       const res = await fetch('/api/sign-up', {
@@ -68,7 +69,7 @@ const SignUp = () => {
         headers: {
           'Content-type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify(values),
       })
 
       console.log('Request sent, awaiting response...');
@@ -89,14 +90,31 @@ const SignUp = () => {
   return (
     <SignUpContainer>
       <Title>Sign Up</Title>
-      <Form onSubmit={handleSubmit}>
-        <Input name='name' type="text" placeholder="Name" required />
-        <Input name='email' type="email" placeholder="Email" required />
-        <Input name='password' type="password" placeholder="Password" required />
-        {error && <span>{error}</span>}
-        <Button type="submit">Sign Up</Button>
-        <span>Already a member ? <SignInLinkButton onClick={() => router.push('/sign-in')}>sign-in</SignInLinkButton></span>
-      </Form>
+      <Formik
+        initialValues={{name: '', email: '', password: '', retypePassword: ''}}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({isSubmitting}) => (
+          <FormContainer>
+          <Input name='name' type="text" placeholder="Name" required />
+          <ErrorMessage name='name' component={ErrorText}/>
+
+          <Input name='email' type="email" placeholder="Email" required />
+          <ErrorMessage name='email' component={ErrorText}/>
+
+          <Input name='password' type="password" placeholder="Password" required />
+          <ErrorMessage name='password' component={ErrorText}/>
+
+          <Input name='retypePassword' type="password" placeholder="Re-enter Password" required />
+          <ErrorMessage name='retypePassword' component={ErrorText}/>
+
+          {error && <ErrorText>{error}</ErrorText>}
+          <Button type="submit" disabled={isSubmitting}>Sign Up</Button>
+          <span>Already a member ? <SignInLinkButton onClick={() => router.push('/sign-in')}>sign-in</SignInLinkButton></span>
+        </FormContainer>
+        )}
+      </Formik>
     </SignUpContainer>
   );
 };

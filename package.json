@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.13.0",
     "babel-plugin-styled-components": "^2.1.4",
     "bcryptjs": "^2.4.3",
+    "formik": "^2.4.6",
     "jose": "^5.7.0",
     "langchain": "^0.2.14",
     "mongodb": "^6.8.0",
@@ -24,6 +25,7 @@
     "recharts": "^2.13.0-alpha.4",
     "styled-components": "^6.1.12",
     "uuid": "^10.0.0",
+    "yup": "^1.4.0",
     "zod": "^3.23.8",
     "zustand": "^4.5.4"
   },

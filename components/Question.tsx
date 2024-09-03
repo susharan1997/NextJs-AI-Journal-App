@@ -5,10 +5,12 @@ import styled from 'styled-components';
 import JournalContentSpinner from './JournalContentSpinner';
 
 const Form = styled.form`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
     margin-top: 30px;
     height: 50px;
-    display: flex;
-    align-items: center;
 `;
 
 const InputContainer = styled.input`
@@ -39,11 +41,14 @@ const Button = styled.button`
 `;
 
 const QaContainer = styled.div`
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 `;
 
 const AnswerContainer = styled.div`
-    width: 100%;
+    width: 96%;
     height: auto;
     max-height: 200px;
     overflow-y: auto;
@@ -99,7 +104,7 @@ const Question = () => {
             </Form>
             <AnswerContainer>
                 {(loading || answer) && (
-                    <AnswerContainer>
+                    <>
                         {loading ? (
                             <TextSpinnerContainer>
                                 <JournalContentSpinner />
@@ -107,7 +112,7 @@ const Question = () => {
                         ) : (
                             <TextPara>{answer}</TextPara>
                         )}
-                    </AnswerContainer>
+                    </>
                 )}
             </AnswerContainer>
         </QaContainer>

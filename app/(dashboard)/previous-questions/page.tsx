@@ -14,13 +14,14 @@ const QuestionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const Text = styled.span`
     font-weight: bold;
     font-size: 25px;
     text-decoration: underline;
+    margin-left: 50px;
 `;
 
 const EmptyText = styled.span`
