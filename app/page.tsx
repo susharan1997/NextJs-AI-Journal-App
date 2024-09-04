@@ -1,6 +1,7 @@
 'use client';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
+import Head from 'next/head';
 
 const LandingPageContainer = styled.div`
   display: flex;
@@ -8,7 +9,7 @@ const LandingPageContainer = styled.div`
   height: 100vh;
   justify-content: space-between;
   align-items: center;
-  font-family: Arial, sans-serif;
+  font-family: 'Merriweather', Georgia, serif;
   background-image: url('/images/journal-bg-image.jpg');
   background-size: cover;
   background-position: center;
@@ -23,19 +24,23 @@ const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
 const Title = styled.h1`
-  font-size: 2em;
+  font-size: 2.2em;
   margin: 0;
+  color: #f1f1f1;
 `;
 
 const Footer = styled.footer`
   width: 100%;
   padding: 10px;
   background-color: #282c34;
-  color: white;
+  color: #ddd;
   text-align: center;
+  font-size: 0.9em;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
 const Body = styled.main`
@@ -53,8 +58,10 @@ const BodyTitle = styled.h2`
   font-size: 1.8em;
   font-weight: bold;
   color: #282c34;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
-  border-radius: 0.5em;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
 `;
 
 const Text = styled.p`
@@ -62,26 +69,28 @@ const Text = styled.p`
   margin-bottom: 20px;
   font-size: 1.5em;
   width: 500px;
-  border: 10px solid #61bbf2;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 20px;
   border-radius: 1em;
   font-weight: bold;
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+  color: #282c34;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 `;
 
 const Button = styled.button`
-  padding: 10px 20px;
-  font-size: 1em;
+  padding: 12px 24px;
+  font-size: 1.2em;
   color: white;
-  background-color: #007bff;
+  background-color: #8b0000;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 
-  &: hover {
-  background-color: #013a78;
-}
+  &:hover {
+    background-color: #5a0000;
+    transform: scale(1.05);
+  }
 `;
 
 const LandingPage: React.FC = () => {
@@ -92,19 +101,26 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <LandingPageContainer>
-      <Header>
-        <Title>MindScribe</Title>
-      </Header>
-      <Body>
-        <BodyTitle>Welcome to the Journal App!</BodyTitle>
-        <Text>
-          This is a tool that analyses users&apos; emotions based on their journal entries and logs the data to plot graphs related to the same.
-        </Text>
-        <Button onClick={handleStart}>Let&apos;s get started!</Button>
-      </Body>
-      <Footer>© 2024 MindScribe App. All rights reserved.</Footer>
-    </LandingPageContainer>
+    <>
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+      <LandingPageContainer>
+        <Header>
+          <Title>MindScribe</Title>
+        </Header>
+        <Body>
+          <BodyTitle>Welcome to the Journal App!</BodyTitle>
+          <Text>
+            This is a tool that analyses users&apos; emotions based on their journal entries and logs the data to plot graphs related to the same.
+          </Text>
+          <Button onClick={handleStart}>Let&apos;s get started!</Button>
+        </Body>
+        <Footer>© 2024 MindScribe App. All rights reserved.</Footer>
+      </LandingPageContainer></>
   );
 };
 

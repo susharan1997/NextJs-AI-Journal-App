@@ -13,10 +13,9 @@ import { userDataType, JournalEntryAnalysisType } from '@/types';
 
 const JournalsContainer = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 5px;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     overflow-y: auto;
-    width: 95%;
+    width: 100%;
     max-height: 75%;
     border: 1px solid grey;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
@@ -38,6 +37,11 @@ const StyledJournalContentSpinner = styled(JournalContentSpinner)`
     left: 55%;
 `;
 
+const JournalPageContainer = styled.div`
+    width: 100%;
+    padding: 20px;
+`;
+
 
 function JournalComponent() {
     const [message, setMessage] = useState<string | null>(null);
@@ -50,7 +54,7 @@ function JournalComponent() {
 
     useEffect(() => {
         const deletedId = searchParams.get('deleted');
-        if(deletedId){
+        if (deletedId) {
             setMessage(`Deleted the journal (${deletedId} successfully!)`);
             setShowBanner(true);
             const url = new URL(window.location.href);
@@ -84,7 +88,7 @@ function JournalComponent() {
                 } catch (error) {
                     console.error('Error fetching journal entries:', error);
                 }
-                finally{
+                finally {
                     setLoading(false);
                 }
             }
@@ -102,30 +106,30 @@ function JournalComponent() {
         }
     }, [userData, setEntries]);
 
-    if(loading){
-        return(
+    if (loading) {
+        return (
             <StyledJournalContentSpinner>
-                <JournalContentSpinner/>
+                <JournalContentSpinner />
             </StyledJournalContentSpinner>
         )
     }
 
     return (
-        <>
+        <JournalPageContainer>
             <Banner message={message || ''} show={showBanner} />
             <Title>
                 Journals
             </Title>
-            <Question/>
+            <Question />
             <NewJournalEntryComponent />
             <JournalsContainer>
                 {Array.isArray(entries) && entries.map((journal: JournalEntryAnalysisType, index: number) => (
-                    <Link href={`/journal/${journal?._id}`} key={index}>
-                        <JournalEntryCard key={journal?._id} entry={journal} />
+                    <Link href={`/journal/${journal?._id}`} key={journal?._id} passHref>
+                        <JournalEntryCard key={index} entry={journal} />
                     </Link>
                 ))}
             </JournalsContainer>
-        </>
+        </JournalPageContainer>
     );
 };
 

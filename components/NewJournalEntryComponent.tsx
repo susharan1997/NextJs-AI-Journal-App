@@ -12,8 +12,8 @@ const Container = styled.div`
   background-color: white;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
   width: 150px;
-  margin: 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
 `;
 
 const Content = styled.div`

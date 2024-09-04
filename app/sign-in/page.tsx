@@ -10,33 +10,49 @@ const SignInContainer = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f5f5f5;
+  background: linear-gradient(to right, #e0eafc, #cfdef3);
 `;
 
 const Title = styled.h1`
   margin-bottom: 20px;
+  font-family: 'Merriweather', Georgia, serif;
+  color: #333;
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 350px;
+  padding: 40px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const Input = styled.input`
+  width: 100%;
+  padding: 12px;
   margin-bottom: 10px;
-  padding: 10px;
   font-size: 1em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: #007bff;
+  }
 `;
 
 const Button = styled.button`
-  padding: 10px;
+  padding: 12px;
   font-size: 1em;
   color: white;
   background-color: #007bff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 
   &:hover {
     background-color: #0056b3;

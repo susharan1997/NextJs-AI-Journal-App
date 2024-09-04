@@ -9,13 +9,13 @@ const Form = styled.form`
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: 30px;
+    margin: 30px 0;
     height: 50px;
 `;
 
 const InputContainer = styled.input`
     position: relative;
-    width: 90%;
+    width: 100%;
     height: 40px;
     border-radius: 5px;
 
@@ -48,7 +48,7 @@ const QaContainer = styled.div`
 `;
 
 const AnswerContainer = styled.div`
-    width: 96%;
+    width: 100%;
     height: auto;
     max-height: 200px;
     overflow-y: auto;
