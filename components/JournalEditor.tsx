@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Spinner from './Spinner';
 import { deleteJournal, updateJournal } from '@/utils/api';
 import JournalContentSpinner from './JournalContentSpinner';
-import Banner from './Banner';
+import EditorBanner from './EditorBanner';
 import { EntryAnalysisType } from '@/types';
 
 interface journalEditorPropType {
@@ -244,7 +244,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
 
     return (
         <Container>
-            <Banner message={message || ''} show={showBanner} />
+            <EditorBanner message={message || ''} show={showBanner} />
             {isDialogOpen && (
                 <DialogOverlay>
                     <DialogBox>
