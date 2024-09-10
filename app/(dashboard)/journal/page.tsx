@@ -16,11 +16,12 @@ const JournalsContainer = styled.div`
     grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     overflow-y: auto;
     width: 100%;
-    max-height: 75%;
+    max-height: 50dvh;
     border: 1px solid grey;
     box-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
     border-radius: 0.5rem;
     background-color: #282c34;
+    font-family: 'Merriweather', Georgia, serif;
 `;
 
 const Title = styled.h2`

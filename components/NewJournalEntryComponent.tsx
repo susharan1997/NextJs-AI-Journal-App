@@ -14,6 +14,7 @@ const Container = styled.div`
   width: 150px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
+  font-family: 'Merriweather', Georgia, serif;
 `;
 
 const Content = styled.div`

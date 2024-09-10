@@ -7,6 +7,7 @@ import { deleteJournal, updateJournal } from '@/utils/api';
 import JournalContentSpinner from './JournalContentSpinner';
 import EditorBanner from './EditorBanner';
 import { EntryAnalysisType } from '@/types';
+import { useFormattedColors } from '@/utils/useFormattedColors';
 
 interface journalEditorPropType {
     journal: EntryAnalysisType | null
@@ -25,6 +26,7 @@ const Container = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
   position: relative;
+  font-family: 'Merriweather', Georgia, serif;
 `;
 
 const SpinnerContainer = styled.div`
@@ -153,7 +155,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
     });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const router = useRouter();
-    const moodColor = currentJournal?.color;
+    const moodColor = useFormattedColors(currentJournal?.color!);
 
     useEffect(() => {
         if (journal) {
@@ -276,7 +278,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
                 }
             </EditorContainer>
             <AnalysisContainer>
-                <AnalysisHeader color={moodColor ? moodColor : '#fff'}>Analysis</AnalysisHeader>
+                <AnalysisHeader color={moodColor}>Analysis</AnalysisHeader>
                 <AnalysisList>
                     <AnalysisListItem>
                         <PropertiesText>Subject:</PropertiesText>

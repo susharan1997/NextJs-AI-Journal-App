@@ -3,14 +3,28 @@ import HistoryChart from '@/components/HistoryChart';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { userDataType } from '../../../types';
-import { EntryAnalysisType } from '../../../models/EntryAnalysis';
+import { EntryAnalysisType } from "@/types";
 
 const ChartContainer = styled.div`
     width: 100%;
+    height: calc(100dvh - 90px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 20px;
+    align-items: flex-start;
+    font-family: 'Merriweather', Georgia, serif;
 `;
 
 const ScoreText = styled.span`
     font-weight: bold;
+    font-size: 1em;
+`;
+
+const PageHeaderText = styled.span`
+    font-weight: bold;
+    font-size: 1.6em;
+    text-decoration: underline;
 `;
 
 const HistoryPage: React.FC = () => {
@@ -50,6 +64,9 @@ const HistoryPage: React.FC = () => {
 
     return(
         <ChartContainer>
+            <PageHeaderText>
+                Graph Analysis
+            </PageHeaderText>
             <ScoreText>
                 {`Average Sentiment Score: ${average}`}
             </ScoreText>

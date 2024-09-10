@@ -2,6 +2,7 @@ import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tool
 import styled from "styled-components";
 import JournalContentSpinner from './JournalContentSpinner';
 import { EntryAnalysisType } from "@/types";
+import { useFormattedColors } from "@/utils/useFormattedColors";
 
 interface HistoryChartProps {
     data: EntryAnalysisType[] | null
@@ -61,9 +62,11 @@ const SpinnerContainer = styled(JournalContentSpinner)`
 `;
 
 const LineChartContainer = styled(LineChart)`
-    width: 100vw;
-    height: 10vh;
-    margin: 30px;
+    align-self: center;
+    padding: 10px;
+    border: 2px solid #006994;
+    border-radius: 1em;
+    font-family: 'Merriweather', Georgia, serif;
 `;
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ payload, label, active }) => {
@@ -76,11 +79,13 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ payload, label, active })
         minute: 'numeric',
     });
 
+    const moodColor = useFormattedColors(payload![0]?.payload?.color);
+
     if (active && payload && payload.length > 0) {
         const analysis = payload[0].payload;
         return (
             <TooltipContainer>
-                <ColorIndicator color={analysis.color}>
+                <ColorIndicator color={moodColor}>
                     <DateLabel>
                         {dateLabel}
                     </DateLabel>
@@ -99,7 +104,7 @@ const HistoryChart: React.FC<HistoryChartProps> = ({ data }) => {
         <>
             {data ?
                 (
-                    <LineChartContainer width={600} height={300} data={data}>
+                    <LineChartContainer width={900} height={400} data={data}>
                         <Line
                             type='monotone'
                             dataKey='sentimentScore'
@@ -111,8 +116,31 @@ const HistoryChart: React.FC<HistoryChartProps> = ({ data }) => {
                         <XAxis
                             dataKey='updatedAt'
                             tickFormatter={(tick) => new Date(tick).toLocaleDateString()}
+                            label={{
+                                value: "Date",
+                                position: "insideBottom",
+                                offset: -5,
+                                style: {
+                                    textAnchor: "middle",
+                                    fill: "#555",
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                },
+                            }}
                         />
-                        <YAxis />
+                        <YAxis
+                            label={{
+                                value: 'Sentiment score',
+                                position: "outsideLeft",
+                                angle: -90,
+                                style: {
+                                    textAnchor: "middle",
+                                    fill: "#555",
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                },
+                            }}
+                        />
                         <Tooltip content={<CustomTooltip />} />
                     </LineChartContainer>
                 )

@@ -11,6 +11,7 @@ const Form = styled.form`
     width: 100%;
     margin: 30px 0;
     height: 50px;
+    font-family: 'Merriweather', Georgia, serif;
 `;
 
 const InputContainer = styled.input`

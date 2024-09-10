@@ -18,7 +18,7 @@
     "langchain": "^0.2.14",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.1",
-    "next": "14.2.5",
+    "next": "^14.2.8",
     "react": "^18",
     "react-autosave": "^0.4.4",
     "react-dom": "^18",

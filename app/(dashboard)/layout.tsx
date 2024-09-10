@@ -6,7 +6,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 
 const Container = styled.div`
   width: 100vw;
-  overflow-x: hidden;
+  font-family: 'Merriweather', Georgia, serif;
 `;
 
 const Sidebar = styled.aside`
@@ -14,7 +14,7 @@ const Sidebar = styled.aside`
   left: 0;
   top: 0;
   height: 100%;
-  width: 220px;
+  width: 200px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   background: #f8f9fa;
   display: flex;
@@ -37,25 +37,32 @@ const NavItem = styled.li`
   font-size: 18px;
   margin: 12px 0;
   list-style: none;
+  
   a {
     text-decoration: none;
     color: #007bff;
     transition: color 0.3s ease;
+    border: 100%;
+    border-radius: 0.5em;
+    padding: 8px 16px;
+    
     &:hover {
       color: #0056b3;
+      background-color: #f1f1f1;
+      border: 1px solid rgba(0, 0, 0, 0.1);
     }
   }
 `;
 
 const Main = styled.div`
-  margin-left: 220px;
+  margin-left: 200px;
   height: 100%;
-  width: calc(100vw - 220px);
+  width: calc(100vw - 200px);
 `;
 
 const Header = styled.header`
   height: 70px;
-  width: calc(100vw - 220px);
+  width: calc(100vw - 200px);
   border-bottom: 3px solid #e0e0e0;
   display: flex;
   align-items: center;
