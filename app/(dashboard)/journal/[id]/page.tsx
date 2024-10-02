@@ -4,6 +4,7 @@ import { NextPage } from 'next';
 import { useEffect, useState } from "react";
 import { userDataType } from '@/types';
 import { EntryAnalysisType } from '@/types';
+import useUserStore from '@/store/useStore';
 
 interface paramsType {
     id: string
@@ -11,19 +12,11 @@ interface paramsType {
 
 const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
     const [entryAnalysis, setEntryAnalysis] = useState<EntryAnalysisType | null>(null);
-    const [parsedUserData, setParsedUserData] = useState<userDataType | null>(null);
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const user = localStorage.getItem('user');
-            const parsedUser = user ? JSON.parse(user) : null;
-            setParsedUserData(parsedUser);
-        }
-    }, []);
+    const userData = useUserStore((state) => state.getUser());
 
     useEffect(() => {
         const journalId = params?.id;
-        if (parsedUserData && journalId) {
+        if (userData && journalId) {
             const fetchEntry = async () => {
                 try {
                     const response = await fetch(`/api/journal-entry/${journalId}`, {
@@ -31,7 +24,7 @@ const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
                         headers: {
                             'Content-type': 'application/json',
                         },
-                        body: JSON.stringify(parsedUserData.id),
+                        body: JSON.stringify(userData.id),
                     });
                     const {entryAnalysis} = await response.json();
                     setEntryAnalysis(entryAnalysis);
@@ -41,7 +34,7 @@ const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
             };
             fetchEntry();
         }
-    }, [parsedUserData, params]);
+    }, [userData, params]);
 
     return (
         <div>

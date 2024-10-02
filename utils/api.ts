@@ -1,4 +1,5 @@
 'use client';
+import { userDataType } from "@/types";
 
 interface contentType {
     content: string
@@ -29,15 +30,12 @@ export async function newEntry(userId: string) {
     }
 }
 
-export const updateJournal = async (id: string, { content }: contentType) => {
+export const updateJournal = async (id: string, { content }: contentType, userData: userDataType) => {
 
     if(!id){
         console.log(`Invalid journal id: ${id}`);
         return null;
     }
-
-    const user = localStorage.getItem('user');
-    const parsedUser = user ? JSON.parse(user) : null;
 
     try {
         const res = await fetch(new Request(`/api/journal-entry/${id}`), {
@@ -47,7 +45,7 @@ export const updateJournal = async (id: string, { content }: contentType) => {
             },
             body: JSON.stringify({
                 content: content,
-                userId: parsedUser?.id,
+                userId: userData?.id,
             }),
         });
         if (!res.ok) {
@@ -63,14 +61,11 @@ export const updateJournal = async (id: string, { content }: contentType) => {
     }
 }
 
-export const deleteJournal = async (id: string) => {
+export const deleteJournal = async (id: string, userData: userDataType) => {
     if(!id){
         console.log(`Invalid journal Id: ${id}`);
         return null;
     }
-
-    const user = localStorage.getItem('user');
-    const parsedUser = user ? JSON.parse(user) : null;
 
     try{
         const res = await fetch(new Request(`/api/journal-entry/${id}`), {
@@ -79,7 +74,7 @@ export const deleteJournal = async (id: string) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                userId: parsedUser?.id,
+                userId: userData?.id,
             })
         });
 
@@ -95,35 +90,46 @@ export const deleteJournal = async (id: string) => {
 
 }
 
-export const askQuestion = async (question: string) => {
+let ongoingRequest: any = null;
+
+export const askQuestion = async (question: string, userData: userDataType) => {
     if(!question){
         console.error('Invalid question:', question);
         return null;
     }
+    if(!userData?.id){
+        console.error('Invalid user data:', userData);
+        return null;
+    }
 
-    const user = localStorage.getItem('user');
-    const parsedUser = user ? JSON.parse(user) : null;
+    if(ongoingRequest) 
+        return ongoingRequest;
 
     try{
-        const res = await fetch(new Request('/api/question'), {
+        ongoingRequest = await fetch(new Request('/api/question'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ 
                 question,
-                userId: parsedUser?.id, 
+                userId: userData?.id, 
             })
         });
+
+        const res = await ongoingRequest;
 
         if(!res.ok){
             throw new Error(`Response not OK: ${res.status}`);
         }
 
-        return res.json();
+        const data = ongoingRequest.json();
+        ongoingRequest = null;
+        return data;
     }
     catch(error){
         console.error('Error while computing question:', error);
+        ongoingRequest = null;
         return {};
     }
 }

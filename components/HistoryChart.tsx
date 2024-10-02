@@ -1,8 +1,9 @@
-import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, TooltipProps } from "recharts";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, TooltipProps } from "recharts";
 import styled from "styled-components";
 import JournalContentSpinner from './JournalContentSpinner';
 import { EntryAnalysisType } from "@/types";
 import { useFormattedColors } from "@/utils/useFormattedColors";
+import { useRouter } from 'next/navigation';
 
 interface HistoryChartProps {
     data: EntryAnalysisType[] | null
@@ -99,7 +100,30 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ payload, label, active })
     return null;
 }
 
+const CustomDot: React.FC<any> = (props) => {
+    const { cx, cy, payload} = props;
+    const router = useRouter();
+
+    const handleClick = () => {
+        router.push(`/journal/${payload.entryId}`);
+    }
+
+    return(
+        <circle
+            cx={cx}
+            cy={cy}
+            r={8}
+            stroke="blue"
+            strokeWidth={2}
+            fill="white"
+            onClick={handleClick}
+            style={{cursor: 'pointer'}}
+        />
+    )
+}
+
 const HistoryChart: React.FC<HistoryChartProps> = ({ data }) => {
+    const router = useRouter();
     return (
         <>
             {data ?
@@ -110,7 +134,7 @@ const HistoryChart: React.FC<HistoryChartProps> = ({ data }) => {
                             dataKey='sentimentScore'
                             stroke="#8884d8"
                             strokeWidth={2}
-                            activeDot={{ r: 8 }}
+                            activeDot={<CustomDot />}
                         />
                         <CartesianGrid stroke="#ccc" />
                         <XAxis

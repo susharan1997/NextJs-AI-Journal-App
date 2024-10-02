@@ -11,6 +11,7 @@ export interface JournalEntryType {
     content: string;
     status: string;
     analysis?: string;
+    embeddings?: number[];
 }
 
 export interface EntryAnalysisType {

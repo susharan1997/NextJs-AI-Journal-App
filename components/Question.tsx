@@ -1,8 +1,9 @@
 'use client';
-import { askQuestion } from '@/utils/api';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import JournalContentSpinner from './JournalContentSpinner';
+import { useQuestionAnswer } from '@/utils/useQuestionAnswer';
+import useUserStore from '@/store/useStore';
 
 const Form = styled.form`
     display: flex;
@@ -72,30 +73,17 @@ const TextPara = styled.p`
 
 const Question = () => {
     const [question, setQuestion] = useState<string>('');
-    const [answer, setAnswer] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
+    const { ask, answer, loading } = useQuestionAnswer();
+    const MemoizedSpinner = React.memo(JournalContentSpinner);
+    const userData = useUserStore((state) => state.getUser());
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLoading(true);
-        setAnswer('');
 
-        try {
-            const { data } = await askQuestion(question);
-            if (data) {
-                setAnswer(data);
-            }
-            else {
-                console.error('Something went wrong!', data);
-            }
-        }
-        catch (error) {
-            console.error('Error while fetching the questions!', error);
-        }
-        finally {
-            setLoading(false);
-        }
-    }
+        if(question && userData && userData?.id)
+            ask(question, userData);
+        
+    }, [question, ask, userData]);
 
     return (
         <QaContainer>
@@ -108,7 +96,7 @@ const Question = () => {
                     <>
                         {loading ? (
                             <TextSpinnerContainer>
-                                <JournalContentSpinner />
+                                <MemoizedSpinner />
                             </TextSpinnerContainer>
                         ) : (
                             <TextPara>{answer}</TextPara>

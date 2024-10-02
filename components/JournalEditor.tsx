@@ -8,6 +8,7 @@ import JournalContentSpinner from './JournalContentSpinner';
 import EditorBanner from './EditorBanner';
 import { EntryAnalysisType } from '@/types';
 import { useFormattedColors } from '@/utils/useFormattedColors';
+import useUserStore from '@/store/useStore';
 
 interface journalEditorPropType {
     journal: EntryAnalysisType | null
@@ -156,6 +157,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const router = useRouter();
     const moodColor = useFormattedColors(currentJournal?.color!);
+    const userData = useUserStore((state) => state.getUser());
 
     useEffect(() => {
         if (journal) {
@@ -173,8 +175,8 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
 
     const handleDelete = async () => {
         try {
-            if(journal?.entryId){
-                const { data } = await deleteJournal(journal?.entryId?._id);
+            if(journal?.entryId && userData && userData?.id){
+                const { data } = await deleteJournal(journal?.entryId?._id, userData);
             if (data) {
                 const url = new URL('/journal', window.location.origin);
                 url.searchParams.append('deleted', data.id);
@@ -223,7 +225,9 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
         }
 
         try {
-            const res = await updateJournal(journalId, { content: newText });
+            let res;
+            if(journalId && userData && userData?.id)
+                res = await updateJournal(journalId, { content: newText }, userData);
 
             if (res && res.data) {
 

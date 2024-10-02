@@ -3,6 +3,7 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import DropdownComponent from '@/components/DropdownComponent';
 import React, { Suspense, useEffect, useState } from 'react';
+import { userDataType } from '@/types';
 
 const Container = styled.div`
   width: 100vw;
@@ -120,7 +121,7 @@ const links = [
 
 const DashboardLayout = ({ children }: any) => {
 
-  const [user, setUser] = useState<{ name: string, id: string } | null>(null);
+  const [user, setUser] = useState<userDataType | null>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');

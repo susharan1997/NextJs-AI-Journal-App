@@ -13,6 +13,7 @@ export interface JournalEntryType extends Document {
     content: string,
     status: JOURNAL_ENTRY_TYPES,
     analysis?: Schema.Types.ObjectId,
+    embeddings: number[],
 }
 
 const JournalEntrySchema = new Schema<JournalEntryType>({
@@ -41,6 +42,10 @@ const JournalEntrySchema = new Schema<JournalEntryType>({
     analysis: {
         type: Schema.Types.ObjectId,
         ref: 'EntryAnalysis',
+    },
+    embeddings: {
+        type: [Number],
+        default: [],
     }
 })
 

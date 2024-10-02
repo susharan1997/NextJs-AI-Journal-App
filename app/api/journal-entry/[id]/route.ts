@@ -6,6 +6,7 @@ import EntryAnalysisModel from "@/models/EntryAnalysis";
 import mongoose from 'mongoose';
 import {analyzeJournalEntry} from '../../../../utils/ai';
 import UserModel from '@/models/User';
+import { OpenAIEmbeddings } from "@langchain/openai";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
     try {
@@ -62,6 +63,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             return NextResponse.json({ error: `Journal entry not found!: ${updateEntry} and userId-> ${userId} and journal content-> ${content} and journal ID-> ${journalId}` }, { status: 404 });
         }
 
+        const openAiEmbeddings = new OpenAIEmbeddings();
+        const updatedEmbeddings = await openAiEmbeddings.embedQuery(content);
+        updateEntry.embeddings = updatedEmbeddings;
+
+        await updateEntry.save();
+ 
         const journalEntryAnalysis = await analyzeJournalEntry(updateEntry);
 
         const analyzedJournalEntry = await EntryAnalysisModel.findOneAndUpdate(

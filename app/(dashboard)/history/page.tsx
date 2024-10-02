@@ -2,8 +2,8 @@
 import HistoryChart from '@/components/HistoryChart';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { userDataType } from '../../../types';
 import { EntryAnalysisType } from "@/types";
+import useUserStore from '@/store/useStore';
 
 const ChartContainer = styled.div`
     width: 100%;
@@ -27,21 +27,18 @@ const PageHeaderText = styled.span`
     text-decoration: underline;
 `;
 
+const NoteText = styled.span`
+    font-size: 10px;
+    color: red;
+`
+
 const HistoryPage: React.FC = () => {
-    const [parsedUserData, setParsedUserData] = useState<userDataType | null>(null);
     const [journalAnalysis, setJournalAnalysis] = useState<EntryAnalysisType[]>([]);
     const [average, setAverage] = useState<number>(0);
+    const userData = useUserStore((state) => state.getUser());
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const user = localStorage.getItem('user');
-            const parsedUser = user ? JSON.parse(user) : null;
-            setParsedUserData(parsedUser);
-        }
-    }, []);
-
-    useEffect(() => {
-        if (parsedUserData) {
+        if (userData) {
             const fetchAnalysis = async () => {
                 try {
                     const response = await fetch(`/api/analysis/`, {
@@ -49,7 +46,7 @@ const HistoryPage: React.FC = () => {
                         headers: {
                             'Content-type': 'application/json',
                         },
-                        body: JSON.stringify(parsedUserData.id),
+                        body: JSON.stringify(userData.id),
                     });
                     const {journalAnalysis, average} = await response.json();
                     setJournalAnalysis(journalAnalysis);
@@ -60,7 +57,7 @@ const HistoryPage: React.FC = () => {
             };
             fetchAnalysis();
         }
-    }, [parsedUserData]);
+    }, [userData]);
 
     return(
         <ChartContainer>
@@ -70,6 +67,9 @@ const HistoryPage: React.FC = () => {
             <ScoreText>
                 {`Average Sentiment Score: ${average}`}
             </ScoreText>
+            <NoteText>
+                * Click on any dot in the line chart to go to that particular journal.
+            </NoteText>
             <HistoryChart data={journalAnalysis} />
         </ChartContainer>
     )

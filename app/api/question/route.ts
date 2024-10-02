@@ -17,7 +17,7 @@ export async function POST(req: NextRequest){
             return NextResponse.json({error: 'Invalid User ID'}, {status: 400});
         }
         
-        const journalEntries = await JournalEntryModel.find({userId: userId}).select('content createdAt');
+        const journalEntries = await JournalEntryModel.find({userId: userId}).select('content createdAt embeddings');
 
         if(!journalEntries){
             return NextResponse.json({error: 'Journal Entry not found!'}, {status: 400});

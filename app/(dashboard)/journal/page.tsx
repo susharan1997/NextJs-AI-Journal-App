@@ -10,6 +10,7 @@ import Question from '../../../components/Question';
 import { useRouter } from 'next/navigation';
 import JournalContentSpinner from '../../../components/JournalContentSpinner';
 import { userDataType, JournalEntryAnalysisType } from '@/types';
+import useUserStore from '../../../store/useStore';
 
 const JournalsContainer = styled.div`
     display: grid;
@@ -52,6 +53,7 @@ function JournalComponent() {
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { setUser } = useUserStore();
 
     useEffect(() => {
         const deletedId = searchParams.get('deleted');
@@ -70,6 +72,7 @@ function JournalComponent() {
             const user = localStorage.getItem('user');
             const parsedUser = user ? JSON.parse(user) : null;
             setUserData(parsedUser);
+            setUser(parsedUser);
         }
     }, []);
 

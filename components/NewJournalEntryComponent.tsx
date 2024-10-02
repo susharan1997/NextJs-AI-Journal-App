@@ -2,8 +2,7 @@
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation'
 import { newEntry } from '@/utils/api';
-import { useEffect, useState } from 'react';
-import { userDataType } from '@/types';
+import useUserStore from '@/store/useStore';
 
 const Container = styled.div`
   cursor: pointer;
@@ -35,25 +34,17 @@ const Title = styled.span`
 
 const NewJournalEntryComponent = () => {
 
-  const [parsedUserData, setParsedUserData] = useState<userDataType | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('user');
-      const parsedUser = user ? JSON.parse(user) : null;
-      setParsedUserData(parsedUser);
-    }
-  }, []);
+  const userData = useUserStore((state) => state.getUser());
 
   const handleOnClick = async () => {
-    if (!parsedUserData) {
+    if (!userData) {
       console.log('User data not available');
       return;
     }
 
     try {
-      const data = await newEntry(parsedUserData.id);
+      const data = await newEntry(userData.id);
       if (data?._id) {
         router.push(`/journal/${data._id}`);
       } else {

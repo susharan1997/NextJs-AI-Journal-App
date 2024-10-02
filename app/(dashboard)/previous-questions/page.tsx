@@ -4,7 +4,7 @@ import styled from "styled-components";
 import QaDropdownComponent from "@/components/QaDropdownComponent";
 import JournalContentSpinner from "@/components/JournalContentSpinner";
 import { QaType } from "../../../types";
-import { userDataType } from "../../../types";
+import useUserStore from "@/store/useStore";
 
 const QuestionsContainer = styled.div`
   width: 100%;
@@ -38,16 +38,8 @@ const TextSpinnerContainer = styled(JournalContentSpinner)`
 
 const PreviousQuestions: React.FC = () => {
     const [qaData, setQaData] = useState<QaType[]>([]);
-    const [userData, setUserData] = useState<userDataType | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const user = localStorage.getItem('user');
-            const parsedUser = user ? JSON.parse(user) : null;
-            setUserData(parsedUser);
-        }
-    }, []);
+    const userData = useUserStore((state) => state.getUser());
 
     useEffect(() => {
         const fetchQa = async () => {
