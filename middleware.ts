@@ -44,5 +44,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/journal/:path*', '/history', '/journal'],
+    matcher: ['/journal/:path*', '/history', '/journal', '/previous-questions'],
 }

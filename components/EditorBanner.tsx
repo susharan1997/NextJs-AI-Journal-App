@@ -6,7 +6,6 @@ const BannerContainer = styled.div.withConfig({shouldForwardProp: (prop) => prop
   align-items: center;
   justify-content: space-between;
   width: 200px;
-  height: 50px;
   padding: 20px;
   background-color: rgba(40, 44, 52, 0.8);
   color: white;
@@ -21,7 +20,6 @@ const BannerContainer = styled.div.withConfig({shouldForwardProp: (prop) => prop
 `;
 
 const Message = styled.span`
-  flex-grow: 1;
   text-align: center;
 `;
 

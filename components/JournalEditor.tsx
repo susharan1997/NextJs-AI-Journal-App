@@ -94,6 +94,21 @@ const DeleteButton = styled.button`
   }
 `;
 
+const SaveButton = styled.button`
+  background-color: #30c71c;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+
+  &: hover {
+    background-color: #1c960c;
+  }
+`;
+
 const PropertiesText = styled.div`
     font-size: 1.2em;
     font-weight: bold;
@@ -117,6 +132,12 @@ const DialogBox = styled.div`
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
+`;
+
+const ButtonContainer = styled.div`
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 `;
 
 const DialogButton = styled.button`
@@ -217,6 +238,40 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
             return;
 
         setIsSaving(true);
+        setTimeout(() => setIsSaving(false), 2000);
+        // const journalId = currentJournal?.entryId?._id;
+
+        // if(!journalId){
+        //     console.log('Invalid Journal Id!');
+        //     return;
+        // }
+
+        // try {
+        //     let res;
+        //     if(journalId && userData && userData?.id)
+        //         res = await updateJournal(journalId, { content: newText }, userData);
+
+        //     if (res && res.data) {
+
+        //         setJournal(res.data);
+        //         setMessage('Journal updated!');
+        //         setShowBanner(true);
+        //         setTimeout(() => setShowBanner(false), 2000);
+        //     }
+        //     else {
+        //         console.error('Failed to update journal or no data returned:', res);
+        //     }
+        // }
+        // catch (error) {
+        //     console.error('Error updating journal:', error);
+        // }
+        // finally {
+        //     setIsSaving(false);
+        // }
+    }
+
+    const handleSave = async () => {
+        setIsLoading(true);
         const journalId = currentJournal?.entryId?._id;
 
         if(!journalId){
@@ -225,27 +280,27 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
         }
 
         try {
-            let res;
-            if(journalId && userData && userData?.id)
-                res = await updateJournal(journalId, { content: newText }, userData);
-
-            if (res && res.data) {
-
-                setJournal(res.data);
-                setMessage('Journal updated!');
-                setShowBanner(true);
-                setTimeout(() => setShowBanner(false), 2000);
+                let res;
+                if(journalId && userData && userData?.id)
+                    res = await updateJournal(journalId, { content: text }, userData);
+    
+                if (res && res.data) {
+    
+                    setJournal(res.data);
+                    setMessage('Journal updated!');
+                    setShowBanner(true);
+                    setTimeout(() => setShowBanner(false), 2000);
+                }
+                else {
+                    console.error('Failed to update journal or no data returned:', res);
+                }
             }
-            else {
-                console.error('Failed to update journal or no data returned:', res);
+            catch (error) {
+                console.error('Error updating journal:', error);
             }
-        }
-        catch (error) {
-            console.error('Error updating journal:', error);
-        }
-        finally {
-            setIsSaving(false);
-        }
+            finally {
+                setIsLoading(false);
+            }
     }
 
     return (
@@ -299,7 +354,10 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
                         </div>
                     </AnalysisListItem>
                     <AnalysisListItem>
-                        <DeleteButton onClick={handleDeleteClick}>Delete</DeleteButton>
+                        <ButtonContainer>
+                            <SaveButton onClick={handleSave}>Update</SaveButton>
+                            <DeleteButton onClick={handleDeleteClick}>Delete</DeleteButton>
+                        </ButtonContainer>
                     </AnalysisListItem>
                 </AnalysisList>
             </AnalysisContainer>

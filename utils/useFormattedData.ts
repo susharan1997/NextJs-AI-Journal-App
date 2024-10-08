@@ -1,6 +1,6 @@
 import { QaType } from '@/types';
 
-const formattedDate = (date: Date) => {
+export const formattedDate = (date: Date) => {
     const dateString = new Date(date);
 
     if(isNaN(dateString.getTime())){

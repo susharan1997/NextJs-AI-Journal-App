@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import JournalContentSpinner from './JournalContentSpinner';
 import { useQuestionAnswer } from '@/utils/useQuestionAnswer';
 import useUserStore from '@/store/useStore';
+import EditorBanner from './EditorBanner';
 
 const Form = styled.form`
     display: flex;
@@ -20,6 +21,7 @@ const InputContainer = styled.input`
     width: 100%;
     height: 40px;
     border-radius: 5px;
+    padding-inline: 10px;
 
     &:focus {
         outline: none;
@@ -74,12 +76,19 @@ const TextPara = styled.p`
 const Question = () => {
     const [question, setQuestion] = useState<string>('');
     const { ask, answer, loading } = useQuestionAnswer();
+    const [message, setMessage] = useState<string | null>(null);
+    const [showBanner, setShowBanner] = useState(false);
     const MemoizedSpinner = React.memo(JournalContentSpinner);
     const userData = useUserStore((state) => state.getUser());
 
     const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if(question === ''){
+            setMessage('Cannot submit an empty message. Please ask a question.');
+            setShowBanner(true);
+        }
 
+        setTimeout(() => setShowBanner(false), 5000);
         if(question && userData && userData?.id)
             ask(question, userData);
         
@@ -87,6 +96,7 @@ const Question = () => {
 
     return (
         <QaContainer>
+            <EditorBanner message={message || ''} show={showBanner} />
             <Form onSubmit={handleSubmit}>
                 <InputContainer type='text' onChange={(e) => setQuestion(e.target.value)} value={question} disabled={loading} placeholder='Ask a question related to a journal...' />
                 <Button type='submit' disabled={loading} >Ask</Button>

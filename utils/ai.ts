@@ -68,8 +68,8 @@ export const analyzeJournalEntry = async (journal: JournalEntryType) => {
 }
 
 const refinedPrompt = `
-You are an AI assistant that helps answer questions based on a user's journal entries. These entries may contain reflections, thoughts, and experiences. 
-Please consider the context of all entries provided and answer the question as thoroughly as possible. 
+You are an AI assistant that helps answer questions based on a user's journal entries. These entries may contain reflections, thoughts, and experiences.
+Please summarize the relevant entries briefly and then answer the question thoroughly.
 
 Here are some relevant journal entries:
 {relevantEntries}
@@ -80,6 +80,12 @@ Answer:
 `;
 
 export const qa = async (journals: JournalEntryType[], question: string) => {
+
+    if (!journals || journals.length === 0) {
+        console.log('Invalid journals:', journals);
+        return 'No relevant journal entries found to answer your question.';
+    }
+
     const docs = journals.map((journal: JournalEntryType) => ({
         document: new Document({
             pageContent: journal.content,
@@ -93,27 +99,38 @@ export const qa = async (journals: JournalEntryType[], question: string) => {
 
     const model = new ChatOpenAI({ temperature: 0, modelName: 'gpt-3.5-turbo' });
     const chain = loadQARefineChain(model);
-    // const store = await MemoryVectorStore.fromDocuments(docs, embeddings);
-    const embeddings = new OpenAIEmbeddings();
-    const store = new MemoryVectorStore(embeddings);
 
-    docs.forEach(doc => store.addVectors([doc.embeddings!], [doc.document]));
+    const relevantEntries = docs.map(doc => doc.document.pageContent).join("\n\n");
 
-    const relevantDocs = await store.similaritySearch(question, 10);
-    const batchSize = 6;
-    let refinedAnswer = '';
+    console.time('AI processing');
+    const result = await chain.invoke({
+        input_documents: docs.map(doc => doc.document),
+        question: refinedPrompt.replace("{relevantEntries}", relevantEntries).replace("{question}", question),
+    });
 
-    for (let i = 0; i < relevantDocs.length; i += batchSize) {
-        const batch = relevantDocs.slice(i, i + batchSize);
-        const relevantEntries = relevantDocs.map(doc => doc.pageContent).join("\n\n");
-        const result = await chain.invoke({
-            input_documents: batch,
-            question: refinedAnswer
-                ? `${refinedAnswer}\nAdditional context:\n${relevantEntries}`
-                : refinedPrompt.replace("{relevantEntries}", relevantEntries).replace("{question}", question),
-        });
-        refinedAnswer = result.output_text; 
-    }
+    console.timeEnd('AI processing');
 
-    return refinedAnswer;
+    return result.output_text || 'No sufficient information found to answer your question.';
+
+    // const batchSize = 3;
+    // let refinedAnswer = '';
+    // const refinedPromises = [];
+
+    // for (let i = 0; i < docs.length; i += batchSize) {
+    //     const batch = docs.slice(i, i + batchSize);
+    //     const relevantEntries = batch.map(doc => doc.document.pageContent).join("\n\n");
+    //     refinedPromises.push(chain.invoke({
+    //         input_documents: batch,
+    //         question: refinedAnswer
+    //             ? `${refinedAnswer}\nAdditional context:\n${relevantEntries}`
+    //             : refinedPrompt.replace("{relevantEntries}", relevantEntries).replace("{question}", question),
+    //     }));
+    // }
+    // console.time('promise process');
+
+    // const results = await Promise.all(refinedPromises);
+    // console.timeEnd('promise process');
+    // refinedAnswer = results.map(result => result.output_text).join('\n\n') || 'No sufficient information found to answer your question.';
+
+    //return refinedAnswer;
 }

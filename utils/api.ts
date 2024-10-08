@@ -1,11 +1,14 @@
 'use client';
 import { userDataType } from "@/types";
+import { formattedDate } from '../utils/useFormattedData';
 
 interface contentType {
     content: string
 }
 
 export async function newEntry(userId: string) {
+    const currentDate = new Date();
+    
     if (userId) {
         const res = await fetch('/api/journal-entry', {
             method: 'POST',
@@ -13,7 +16,7 @@ export async function newEntry(userId: string) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                content: 'New content',
+                content: `**Journal Entry: ${formattedDate(currentDate)}**`,
                 userId: userId,
             }),
         });
