@@ -1,6 +1,6 @@
 'use client';
 import Banner from '@/components/Banner';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import NewJournalEntryComponent from '@/components/NewJournalEntryComponent';
 import JournalEntryCard from '@/components/JournalEntryCard';
 import styled from 'styled-components';
@@ -11,6 +11,9 @@ import { useRouter } from 'next/navigation';
 import JournalContentSpinner from '../../../components/JournalContentSpinner';
 import { userDataType, JournalEntryAnalysisType } from '@/types';
 import useUserStore from '../../../store/useStore';
+import SearchComponent from '../../../components/SearchComponent';
+import { isoStringFormat } from '@/utils/useFormattedData';
+import EditorBanner from '@/components/EditorBanner';
 
 const JournalsContainer = styled.div`
     display: grid;
@@ -44,13 +47,29 @@ const JournalPageContainer = styled.div`
     padding: 20px;
 `;
 
+const EmptyJournalContainer = styled.div`
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const EmptyText = styled.span`
+    font-size: 2rem;
+    color: white;
+`;
+
 
 function JournalComponent() {
     const [message, setMessage] = useState<string | null>(null);
     const [showBanner, setShowBanner] = useState(false);
     const [entries, setEntries] = useState<JournalEntryAnalysisType[] | null>([]);
+    const [filteredEntries, setFilteredEntries] = useState<JournalEntryAnalysisType[] | null>(null);
     const [userData, setUserData] = useState<userDataType | null>(null);
+    const [emptyMsg, setEmptyMsg] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
     const searchParams = useSearchParams();
     const router = useRouter();
     const { setUser } = useUserStore();
@@ -110,6 +129,45 @@ function JournalComponent() {
         }
     }, [userData, setEntries]);
 
+    const handleDate = (e: ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        const date = value ? new Date(value) : null;
+
+        if (id === 'start-date')
+            setStartDate(date);
+        else if (id === 'end-date')
+            setEndDate(date);
+    }
+
+    const handleSearch = () => {
+        if (!startDate || !endDate) {
+            setMessage('Please select both start and end dates!');
+            setShowBanner(true);
+            setTimeout(() => setShowBanner(false), 3000);
+            return;
+        }
+
+        const filteredEntries = entries?.filter(entry => {
+            const entryDate = new Date(entry.createdAt);
+            return entryDate >= startDate! && entryDate <= endDate!
+        })
+        if (filteredEntries && filteredEntries.length > 0) {
+            setFilteredEntries(filteredEntries);
+            setEmptyMsg(false);
+        }
+        else {
+            setFilteredEntries([]);
+            setEmptyMsg(true);
+        }
+    }
+
+    const handleClear = () => {
+        setStartDate(null);
+        setEndDate(null);
+        setFilteredEntries(null);
+        setEmptyMsg(false);
+    }
+
     if (loading) {
         return (
             <StyledJournalContentSpinner>
@@ -120,18 +178,41 @@ function JournalComponent() {
 
     return (
         <JournalPageContainer>
-            <Banner message={message || ''} show={showBanner} />
+            <Banner
+                message={message || ''}
+                show={showBanner}
+            />
             <Title>
                 Journals
             </Title>
             <Question />
             <NewJournalEntryComponent />
+            <SearchComponent
+                journal={entries}
+                handleDate={handleDate}
+                handleClear={handleClear}
+                handleSearch={handleSearch}
+                startDate={isoStringFormat(startDate!)}
+                endDate={isoStringFormat(endDate!)} />
             <JournalsContainer>
-                {Array.isArray(entries) && entries.map((journal: JournalEntryAnalysisType, index: number) => (
-                    <Link href={`/journal/${journal?._id}`} key={journal?._id} passHref>
-                        <JournalEntryCard key={index} entry={journal} />
-                    </Link>
-                ))}
+                {
+                    emptyMsg ?
+                        <EmptyJournalContainer>
+                            <EmptyText>
+                                No Journal entries found
+                            </EmptyText>
+                        </EmptyJournalContainer>
+                        :
+                        (filteredEntries || entries)?.map((journal: JournalEntryAnalysisType, index: number) => (
+                            <Link
+                                href={`/journal/${journal?._id}`}
+                                key={journal?._id} passHref>
+                                <JournalEntryCard
+                                    key={index}
+                                    entry={journal} />
+                            </Link>
+                        ))
+                }
             </JournalsContainer>
         </JournalPageContainer>
     );

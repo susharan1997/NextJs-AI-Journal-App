@@ -22,6 +22,10 @@ export const formattedDate = (date: Date) => {
     return ' ' + formattedDate || '-';
 }
 
+export const isoStringFormat = (date: Date) => {
+    return date ? date.toISOString().split('T')[0] : '';
+}
+
 export const formattedData = (data: QaType[]): QaType[] => {
     const updatedData = data.map((qa: QaType) => ({
         ...qa,

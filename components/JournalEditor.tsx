@@ -127,6 +127,7 @@ const DialogOverlay = styled.div`
 `;
 
 const DialogBox = styled.div`
+  width: 250px;
   background: #fff;
   padding: 1rem;
   border-radius: 8px;
@@ -136,8 +137,9 @@ const DialogBox = styled.div`
 
 const ButtonContainer = styled.div`
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
+    gap: 20px;
 `;
 
 const DialogButton = styled.button`
@@ -161,6 +163,18 @@ const CancelButton = styled(DialogButton)`
   &:hover {
     background-color: #aaa;
   }
+`;
+
+const CancelText = styled.span`
+    font-size: 1rem;
+    margin-bottom: 20px;
+`;
+
+const UpdateDeleteButtonContainer = styled.div`
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
 `;
 
 const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
@@ -239,35 +253,6 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
 
         setIsSaving(true);
         setTimeout(() => setIsSaving(false), 2000);
-        // const journalId = currentJournal?.entryId?._id;
-
-        // if(!journalId){
-        //     console.log('Invalid Journal Id!');
-        //     return;
-        // }
-
-        // try {
-        //     let res;
-        //     if(journalId && userData && userData?.id)
-        //         res = await updateJournal(journalId, { content: newText }, userData);
-
-        //     if (res && res.data) {
-
-        //         setJournal(res.data);
-        //         setMessage('Journal updated!');
-        //         setShowBanner(true);
-        //         setTimeout(() => setShowBanner(false), 2000);
-        //     }
-        //     else {
-        //         console.error('Failed to update journal or no data returned:', res);
-        //     }
-        // }
-        // catch (error) {
-        //     console.error('Error updating journal:', error);
-        // }
-        // finally {
-        //     setIsSaving(false);
-        // }
     }
 
     const handleSave = async () => {
@@ -309,9 +294,11 @@ const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
             {isDialogOpen && (
                 <DialogOverlay>
                     <DialogBox>
-                        <p>Are you sure?</p>
-                        <DialogButton onClick={handleConfirmDelete}>Yes</DialogButton>
-                        <CancelButton onClick={handleCancelDelete}>Cancel</CancelButton>
+                        <CancelText>Are you sure?</CancelText>
+                        <UpdateDeleteButtonContainer>
+                            <DialogButton onClick={handleConfirmDelete}>Yes</DialogButton>
+                            <CancelButton onClick={handleCancelDelete}>Cancel</CancelButton>
+                        </UpdateDeleteButtonContainer>
                     </DialogBox>
                 </DialogOverlay>
             )}
