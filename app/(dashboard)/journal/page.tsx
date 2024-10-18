@@ -13,7 +13,6 @@ import { userDataType, JournalEntryAnalysisType } from '@/types';
 import useUserStore from '../../../store/useStore';
 import SearchComponent from '../../../components/SearchComponent';
 import { isoStringFormat } from '@/utils/useFormattedData';
-import EditorBanner from '@/components/EditorBanner';
 
 const JournalsContainer = styled.div`
     display: grid;
@@ -147,10 +146,15 @@ function JournalComponent() {
             return;
         }
 
+        const stripTime = (date: Date) => {
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        }
+
         const filteredEntries = entries?.filter(entry => {
-            const entryDate = new Date(entry.createdAt);
-            return entryDate >= startDate! && entryDate <= endDate!
-        })
+            const entryDate = stripTime(new Date(entry.createdAt));
+            return entryDate >= stripTime(startDate) && entryDate <= stripTime(endDate);
+        });
+
         if (filteredEntries && filteredEntries.length > 0) {
             setFilteredEntries(filteredEntries);
             setEmptyMsg(false);

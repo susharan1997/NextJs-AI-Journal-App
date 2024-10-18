@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from 'jose';
-import { revalidatePath } from "next/cache";
 
 const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+
+if(!SECRET_KEY){
+    throw new Error('JWT_SECRET_KEY environment variable is missing');
+}
 
 const isAuthenticated = async (req: NextRequest) => {
     const token = req.cookies.get('auth-token')?.value;
@@ -25,9 +28,9 @@ const isAuthenticated = async (req: NextRequest) => {
 
 export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
-    const publicPaths = ['/sign-in', '/sign-up', '/'];
+    const publicPaths = /^\/(sign-in|sign-up|)$/;
 
-    if (publicPaths.includes(pathname)) {
+    if (publicPaths.test(pathname)) {
         console.log('Accessing public paths, proceeding without token authentication.')
         return NextResponse.next();
     }

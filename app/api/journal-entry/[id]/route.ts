@@ -43,9 +43,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         const { content, userId } = await req.json();
         const journalId = params.id;
 
+        let journalIdErrorMsg = `Invalid or missing user Id: ${userId} or journal Id: ${journalId}`;
 
         if (!userId || !journalId || !mongoose.Types.ObjectId.isValid(journalId)) {
-            return NextResponse.json({ error: `Invalid or missing user Id: ${userId} or journal Id: ${journalId}` }, { status: 400 });
+            return NextResponse.json({ error: journalIdErrorMsg }, { status: 400 });
         }
 
         const summarizationModel = new ChatOpenAI({temperature: 0, modelName: 'gpt-3.5-turbo'});
@@ -75,10 +76,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             }
         );
 
-        console.log(updateEntry, 'UPDATE ENTRY');
+        let updateEntryErrorMsg = `Journal entry not found!: ${updateEntry} and userId-> ${userId} and journal 
+        content-> ${content} and journal ID-> ${journalId}`;
 
         if (!updateEntry) {
-            return NextResponse.json({ error: `Journal entry not found!: ${updateEntry} and userId-> ${userId} and journal content-> ${content} and journal ID-> ${journalId}` }, { status: 404 });
+            return NextResponse.json({ error: updateEntryErrorMsg }, { status: 404 });
         }
 
         const openAiEmbeddings = new OpenAIEmbeddings();
@@ -109,8 +111,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             }
         );
 
+        let journalEntryErrorMsg = `Journal entry analysis from the AI model not updated!: ${analyzedJournalEntry} and 
+        userId-> ${userId} and journal content-> ${content} and journal ID-> ${journalId}`;
+
         if (!analyzedJournalEntry) {
-            return NextResponse.json({ error: `Journal entry analysis from the AI model not updated!: ${analyzedJournalEntry} and userId-> ${userId} and journal content-> ${content} and journal ID-> ${journalId}` }, { status: 404 });
+            return NextResponse.json({ error: journalEntryErrorMsg }, { status: 404 });
         }
 
         return NextResponse.json({ data: { ...updateEntry, analysis: analyzedJournalEntry } });

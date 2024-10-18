@@ -18,7 +18,7 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
 const TooltipContainer = styled.div`
   padding: 2rem;
   width: 150px;
-  height: 100px;
+  height: 125px;
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -49,11 +49,18 @@ const DateLabel = styled.p`
 
 const MoodText = styled.p`
   width: 140px;
-  margin-top: 10px;
   text-align: center;
   font-size: 0.8rem;
   text-transform: uppercase;
   font-weight: bold;
+`;
+
+const ScoreText = styled.p`
+    width: 140px;
+    text-align: center;
+    font-size: 1rem;
+    white-space: nowrap;
+    font-weight: bold;
 `;
 
 const SpinnerContainer = styled(JournalContentSpinner)`
@@ -90,6 +97,9 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ payload, label, active })
                     <DateLabel>
                         {dateLabel}
                     </DateLabel>
+                    <ScoreText>
+                        Score: {analysis.sentimentScore}
+                    </ScoreText>
                     <MoodText>
                         {analysis.mood}
                     </MoodText>
@@ -123,7 +133,6 @@ const CustomDot: React.FC<any> = (props) => {
 }
 
 const HistoryChart: React.FC<HistoryChartProps> = ({ data }) => {
-    const router = useRouter();
     return (
         <>
             {data ?

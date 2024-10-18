@@ -6,6 +6,18 @@ import QuestionModel from '../../../models/Question';
 import pinecone from '@/lib/pineconeClient';
 import { OpenAIEmbeddings } from "@langchain/openai";
 
+interface PineconeObjectType {
+    id: string,
+    score: number,
+    values: [],
+    sparseValues: undefined,
+    metadata: undefined,
+}
+
+type PineconeType = {
+     matches: PineconeObjectType[]
+}
+
 export async function POST(req: NextRequest) {
     try {
         dbConnect();
@@ -25,13 +37,13 @@ export async function POST(req: NextRequest) {
         const index = pinecone.index('mindscribe-journal');
 
 
-        const result = await index.query({
+        const result: PineconeType = await index.query({
             vector: questionEmbeddings,
             topK: 2,
             includeValues: false,
         });
 
-        const journalIds = result.matches.map(journal => journal.id);
+        const journalIds = result.matches.map((journal:PineconeObjectType) => journal.id);
 
         if (!journalIds || journalIds.length === 0) {
             return NextResponse.json({ error: 'Invalid journal IDs' }, { status: 404 });
