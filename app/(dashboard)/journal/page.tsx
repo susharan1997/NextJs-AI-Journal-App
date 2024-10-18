@@ -92,7 +92,7 @@ function JournalComponent() {
             setUserData(parsedUser);
             setUser(parsedUser);
         }
-    }, []);
+    }, [setUser]);
 
     useEffect(() => {
         const fetchEntries = async () => {

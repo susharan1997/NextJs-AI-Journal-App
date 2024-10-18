@@ -5,13 +5,14 @@ import { qa } from "@/utils/ai";
 import QuestionModel from '../../../models/Question';
 import pinecone from '@/lib/pineconeClient';
 import { OpenAIEmbeddings } from "@langchain/openai";
+import { RecordMetadata, RecordSparseValues } from "@pinecone-database/pinecone";
 
 interface PineconeObjectType {
     id: string,
-    score: number,
-    values: [],
-    sparseValues: undefined,
-    metadata: undefined,
+    score?: number | undefined,
+    values: number[],
+    sparseValues?: RecordSparseValues | undefined,
+    metadata?: RecordMetadata | undefined,
 }
 
 type PineconeType = {
