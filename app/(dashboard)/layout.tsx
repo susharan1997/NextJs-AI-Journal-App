@@ -6,12 +6,13 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { userDataType } from '@/types';
 
 const Container = styled.div`
-  width: 100vw;
   font-family: 'Merriweather', Georgia, serif;
+  display: flex;
+  justify-content: flex-end;
 `;
 
 const Sidebar = styled.aside`
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   height: 100%;
@@ -56,7 +57,6 @@ const NavItem = styled.li`
 `;
 
 const Main = styled.div`
-  margin-left: 200px;
   height: 100%;
   width: calc(100vw - 200px);
 `;
@@ -86,7 +86,6 @@ const NavContent = styled.div`
 `;
 
 const Content = styled.div`
-  height: calc(100vh - 70px);
   padding: 20px;
 `;
 
