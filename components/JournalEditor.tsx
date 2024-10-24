@@ -1,23 +1,23 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import Spinner from './Spinner';
-import { deleteJournal, updateJournal } from '@/utils/api';
-import JournalContentSpinner from './JournalContentSpinner';
-import EditorBanner from './EditorBanner';
-import { EntryAnalysisType } from '@/types';
-import { useFormattedColors } from '@/utils/useFormattedColors';
-import useUserStore from '@/store/useStore';
+"use client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
+import Spinner from "./Spinner";
+import { deleteJournal, updateJournal } from "@/utils/api";
+import JournalContentSpinner from "./JournalContentSpinner";
+import EditorBanner from "./EditorBanner";
+import { EntryAnalysisType } from "@/types";
+import { useFormattedColors } from "@/utils/useFormattedColors";
+import useUserStore from "@/store/useStore";
 
 interface journalEditorPropType {
-    journal: EntryAnalysisType | null
+  journal: EntryAnalysisType | null;
 }
 
 interface emotionTypes {
-    subject: string,
-    mood: string,
-    negative: boolean,
+  subject: string;
+  mood: string;
+  negative: boolean;
 }
 
 const Container = styled.div`
@@ -27,7 +27,7 @@ const Container = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
   position: relative;
-  font-family: 'Merriweather', Georgia, serif;
+  font-family: "Merriweather", Georgia, serif;
 `;
 
 const SpinnerContainer = styled.div`
@@ -38,9 +38,9 @@ const SpinnerContainer = styled.div`
 `;
 
 const TextSpinnerContainer = styled.div`
-    top: 50%;
-    left: 30%;
-    position: absolute;
+  top: 50%;
+  left: 30%;
+  position: absolute;
 `;
 
 const EditorContainer = styled.div`
@@ -59,11 +59,11 @@ const AnalysisContainer = styled.div`
 `;
 
 const AnalysisHeader = styled.h2.withConfig({
-    shouldForwardProp: (prop) => prop !== 'color',
-}) <{ color: string }>`
+  shouldForwardProp: (prop) => prop !== "color",
+})<{ color: string }>`
   font-size: 1.5rem;
   font-weight: bold;
-  background-color: ${props => props.color};
+  background-color: ${(props) => props.color};
   color: #000;
   padding: 1rem;
 `;
@@ -110,8 +110,8 @@ const SaveButton = styled.button`
 `;
 
 const PropertiesText = styled.div`
-    font-size: 1.2em;
-    font-weight: bold;
+  font-size: 1.2em;
+  font-weight: bold;
 `;
 
 const DialogOverlay = styled.div`
@@ -136,10 +136,10 @@ const DialogBox = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 20px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
 `;
 
 const DialogButton = styled.button`
@@ -166,190 +166,181 @@ const CancelButton = styled(DialogButton)`
 `;
 
 const CancelText = styled.span`
-    font-size: 1rem;
-    margin-bottom: 20px;
+  font-size: 1rem;
+  margin-bottom: 20px;
 `;
 
 const UpdateDeleteButtonContainer = styled.div`
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 20px;
 `;
 
-const JournalEditor: React.FC<journalEditorPropType> = ({journal}) => {
-    const [text, setText] = useState('New content');
-    const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
-    const [isSaving, setIsSaving] = useState(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [message, setMessage] = useState<string | null>(null);
-    const [showBanner, setShowBanner] = useState(false);
-    const [analysis, setAnalysis] = useState<emotionTypes>({
-        subject: '',
-        mood: '',
-        negative: false,
-    });
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const router = useRouter();
-    const moodColor = useFormattedColors(currentJournal?.color!);
-    const userData = useUserStore((state) => state.getUser());
+const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
+  const [text, setText] = useState("New content");
+  const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [message, setMessage] = useState<string | null>(null);
+  const [showBanner, setShowBanner] = useState(false);
+  const [analysis, setAnalysis] = useState<emotionTypes>({
+    subject: "",
+    mood: "",
+    negative: false,
+  });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
+  const moodColor = useFormattedColors(currentJournal?.color!);
+  const userData = useUserStore((state) => state.getUser());
 
-    useEffect(() => {
-        if (journal) {
-            const journalContent = journal?.entryId?.content ?? '';
-            setText(journalContent);
-            setJournal(journal);
-            setAnalysis({
-                subject: journal?.subject ?? 'No Subject',
-                mood: journal?.mood ?? 'No Mood',
-                negative: journal?.negative ?? false,
-            })
-            setIsLoading(false);
+  useEffect(() => {
+    if (journal) {
+      const journalContent = journal?.entryId?.content ?? "";
+      setText(journalContent);
+      setJournal(journal);
+      setAnalysis({
+        subject: journal?.subject ?? "No Subject",
+        mood: journal?.mood ?? "No Mood",
+        negative: journal?.negative ?? false,
+      });
+      setIsLoading(false);
+    }
+  }, [journal]);
+
+  const handleDelete = async () => {
+    try {
+      if (journal?.entryId && userData && userData?.id) {
+        const { data } = await deleteJournal(journal?.entryId?._id, userData);
+        if (data) {
+          const url = new URL("/journal", window.location.origin);
+          url.searchParams.append("deleted", data.id);
+          router.replace(url.toString());
+        } else {
+          console.log("Journal not deleted!");
         }
-    }, [journal]);
+      } else {
+        console.log("Invalid journal Id!");
+      }
+    } catch (error) {
+      console.error("Error deleting journal:", error);
+    }
+  };
 
-    const handleDelete = async () => {
-        try {
-            if(journal?.entryId && userData && userData?.id){
-                const { data } = await deleteJournal(journal?.entryId?._id, userData);
-            if (data) {
-                const url = new URL('/journal', window.location.origin);
-                url.searchParams.append('deleted', data.id);
-                router.replace(url.toString());
-            }
-            else {
-                console.log('Journal not deleted!');
-            }
-            }
-            else{
-                console.log('Invalid journal Id!');
-            }
-        }
-        catch (error) {
-            console.error('Error deleting journal:', error);
-        }
-    };
+  const handleDeleteClick = () => {
+    setIsDialogOpen(true);
+  };
 
-    const handleDeleteClick = () => {
-        setIsDialogOpen(true);
-    };
+  const handleConfirmDelete = async () => {
+    setIsDialogOpen(false);
+    await handleDelete();
+  };
 
-    const handleConfirmDelete = async () => {
-        setIsDialogOpen(false);
-        await handleDelete();
-    };
+  const handleCancelDelete = () => {
+    setIsDialogOpen(false);
+  };
 
-    const handleCancelDelete = () => {
-        setIsDialogOpen(false);
-    };
+  const handleJournalUpdate = async (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const newText = e.target.value as string;
+    setText(newText);
+    setJournal(journal);
 
-    const handleJournalUpdate = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newText = e.target.value as string;
-        setText(newText);
-        setJournal(journal);
+    if (newText === journal?.entryId?.content) return;
 
-        if (newText === journal?.entryId?.content)
-            return;
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 2000);
+  };
 
-        setIsSaving(true);
-        setTimeout(() => setIsSaving(false), 2000);
+  const handleSave = async () => {
+    setIsLoading(true);
+    const journalId = currentJournal?.entryId?._id;
+
+    if (!journalId) {
+      console.log("Invalid Journal Id!");
+      return;
     }
 
-    const handleSave = async () => {
-        setIsLoading(true);
-        const journalId = currentJournal?.entryId?._id;
+    try {
+      let res;
+      if (journalId && userData && userData?.id)
+        res = await updateJournal(journalId, { content: text }, userData);
 
-        if(!journalId){
-            console.log('Invalid Journal Id!');
-            return;
-        }
-
-        try {
-                let res;
-                if(journalId && userData && userData?.id)
-                    res = await updateJournal(journalId, { content: text }, userData);
-    
-                if (res && res.data) {
-    
-                    setJournal(res.data);
-                    setMessage('Journal updated!');
-                    setShowBanner(true);
-                    setTimeout(() => setShowBanner(false), 2000);
-                }
-                else {
-                    console.error('Failed to update journal or no data returned:', res);
-                }
-            }
-            catch (error) {
-                console.error('Error updating journal:', error);
-            }
-            finally {
-                setIsLoading(false);
-            }
+      if (res && res.data) {
+        setJournal(res.data);
+        setMessage("Journal updated!");
+        setShowBanner(true);
+        setTimeout(() => setShowBanner(false), 2000);
+      } else {
+        console.error("Failed to update journal or no data returned:", res);
+      }
+    } catch (error) {
+      console.error("Error updating journal:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    return (
-        <Container>
-            <EditorBanner message={message || ''} show={showBanner} />
-            {isDialogOpen && (
-                <DialogOverlay>
-                    <DialogBox>
-                        <CancelText>Are you sure?</CancelText>
-                        <UpdateDeleteButtonContainer>
-                            <DialogButton onClick={handleConfirmDelete}>Yes</DialogButton>
-                            <CancelButton onClick={handleCancelDelete}>Cancel</CancelButton>
-                        </UpdateDeleteButtonContainer>
-                    </DialogBox>
-                </DialogOverlay>
-            )}
-            <SpinnerContainer>
-                {isSaving ? (
-                    <div role="status">
-                        <span>Saving...</span>
-                    </div>
-                ) : (
-                    <div><Spinner /></div>
-                )}
-            </SpinnerContainer>
-            <EditorContainer>
-                {
-                    isLoading ? (
-                        <TextSpinnerContainer>
-                            <JournalContentSpinner />
-                        </TextSpinnerContainer>
-
-                    ) : (
-                        <TextArea value={text} onChange={handleJournalUpdate} />
-                    )
-                }
-            </EditorContainer>
-            <AnalysisContainer>
-                <AnalysisHeader color={moodColor}>Analysis</AnalysisHeader>
-                <AnalysisList>
-                    <AnalysisListItem>
-                        <PropertiesText>Subject:</PropertiesText>
-                        <div>{analysis?.subject}</div>
-                    </AnalysisListItem>
-                    <AnalysisListItem>
-                        <PropertiesText>Mood:</PropertiesText>
-                        <div>{analysis?.mood}</div>
-                    </AnalysisListItem>
-                    <AnalysisListItem>
-                        <PropertiesText>Negative:</PropertiesText>
-                        <div>
-                            {analysis?.negative === false ? 'False' : 'True'}
-                        </div>
-                    </AnalysisListItem>
-                    <AnalysisListItem>
-                        <ButtonContainer>
-                            <SaveButton onClick={handleSave}>Update</SaveButton>
-                            <DeleteButton onClick={handleDeleteClick}>Delete</DeleteButton>
-                        </ButtonContainer>
-                    </AnalysisListItem>
-                </AnalysisList>
-            </AnalysisContainer>
-        </Container>
-    );
+  return (
+    <Container>
+      <EditorBanner message={message || ""} show={showBanner} />
+      {isDialogOpen && (
+        <DialogOverlay>
+          <DialogBox>
+            <CancelText>Are you sure?</CancelText>
+            <UpdateDeleteButtonContainer>
+              <DialogButton onClick={handleConfirmDelete}>Yes</DialogButton>
+              <CancelButton onClick={handleCancelDelete}>Cancel</CancelButton>
+            </UpdateDeleteButtonContainer>
+          </DialogBox>
+        </DialogOverlay>
+      )}
+      <SpinnerContainer>
+        {isSaving ? (
+          <div role="status">
+            <span>Saving...</span>
+          </div>
+        ) : (
+          <div>
+            <Spinner />
+          </div>
+        )}
+      </SpinnerContainer>
+      <EditorContainer>
+        {isLoading ? (
+          <TextSpinnerContainer>
+            <JournalContentSpinner />
+          </TextSpinnerContainer>
+        ) : (
+          <TextArea value={text} onChange={handleJournalUpdate} />
+        )}
+      </EditorContainer>
+      <AnalysisContainer>
+        <AnalysisHeader color={moodColor}>Analysis</AnalysisHeader>
+        <AnalysisList>
+          <AnalysisListItem>
+            <PropertiesText>Subject:</PropertiesText>
+            <div>{analysis?.subject}</div>
+          </AnalysisListItem>
+          <AnalysisListItem>
+            <PropertiesText>Mood:</PropertiesText>
+            <div>{analysis?.mood}</div>
+          </AnalysisListItem>
+          <AnalysisListItem>
+            <PropertiesText>Negative:</PropertiesText>
+            <div>{analysis?.negative === false ? "False" : "True"}</div>
+          </AnalysisListItem>
+          <AnalysisListItem>
+            <ButtonContainer>
+              <SaveButton onClick={handleSave}>Update</SaveButton>
+              <DeleteButton onClick={handleDeleteClick}>Delete</DeleteButton>
+            </ButtonContainer>
+          </AnalysisListItem>
+        </AnalysisList>
+      </AnalysisContainer>
+    </Container>
+  );
 };
 
-export default JournalEditor; 
+export default JournalEditor;

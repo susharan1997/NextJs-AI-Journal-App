@@ -8,62 +8,70 @@ import { revalidatePath } from "next/cache";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
 export async function POST(req: NextRequest) {
+  try {
+    await dbConnect();
+
+    const { content, userId } = await req.json();
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return NextResponse.json(
+        { error: `Invalid user ID! ${userId}` },
+        { status: 400 }
+      );
+    }
+
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: `User not found! ${user}` },
+        { status: 404 }
+      );
+    }
+
+    const openAIEmbeddings = new OpenAIEmbeddings();
+
+    let embeddings: number[] = [];
     try {
-        await dbConnect();
-
-        const { content, userId } = await req.json();
-
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return NextResponse.json({ error: `Invalid user ID! ${userId}` }, { status: 400 });
-        }
-
-        const user = await UserModel.findById(userId);
-
-        if (!user) {
-            return NextResponse.json({ error: `User not found! ${user}` }, { status: 404 });
-        }
-
-        const openAIEmbeddings = new OpenAIEmbeddings();
-
-        let embeddings: number[] = [];
-        try {
-            embeddings = await openAIEmbeddings.embedQuery(content);
-        } catch (error) {
-            console.error('Error generating embeddings:', error);
-        }
-
-        const newJournalEntry = await JournalEntryModel.create({
-            content: content,
-            userId: user._id,
-            status: 'DRAFT',
-            embeddings: embeddings,
-        });
-
-        const newEntryAnalysis = await EntryAnalysisModel.create({
-            mood: 'Neutral',
-            subject: 'None',
-            negative: false,
-            summary: 'Summary',
-            sentimentScore: 0,
-            color: '#0101fe',
-            userId: user._id,
-            entryId: newJournalEntry._id,
-        });
-
-        newJournalEntry.analysis = newEntryAnalysis._id;
-
-        await newJournalEntry.save();
-
-        user.entries.push(newJournalEntry._id);
-        user.analysis.push(newEntryAnalysis._id);
-        await user.save();
-        console.log(newJournalEntry, 'NEW JOURNAL ENTRY');
-        revalidatePath('/journal');
-
-        return NextResponse.json({ data: newJournalEntry }, { status: 200 });
+      embeddings = await openAIEmbeddings.embedQuery(content);
+    } catch (error) {
+      console.error("Error generating embeddings:", error);
     }
-    catch (error) {
-        console.log('Error during Journal entry creation!', error);
-        return NextResponse.json({ error: `Internal server error ${error}` }, { status: 500 });
-    }
+
+    const newJournalEntry = await JournalEntryModel.create({
+      content: content,
+      userId: user._id,
+      status: "DRAFT",
+      embeddings: embeddings,
+    });
+
+    const newEntryAnalysis = await EntryAnalysisModel.create({
+      mood: "Neutral",
+      subject: "None",
+      negative: false,
+      summary: "Summary",
+      sentimentScore: 0,
+      color: "#0101fe",
+      userId: user._id,
+      entryId: newJournalEntry._id,
+    });
+
+    newJournalEntry.analysis = newEntryAnalysis._id;
+
+    await newJournalEntry.save();
+
+    user.entries.push(newJournalEntry._id);
+    user.analysis.push(newEntryAnalysis._id);
+    await user.save();
+    console.log(newJournalEntry, "NEW JOURNAL ENTRY");
+    revalidatePath("/journal");
+
+    return NextResponse.json({ data: newJournalEntry }, { status: 200 });
+  } catch (error) {
+    console.log("Error during Journal entry creation!", error);
+    return NextResponse.json(
+      { error: `Internal server error ${error}` },
+      { status: 500 }
+    );
+  }
 }

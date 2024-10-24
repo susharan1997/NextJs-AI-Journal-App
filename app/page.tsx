@@ -1,7 +1,7 @@
-'use client';
-import styled from 'styled-components';
-import { useRouter } from 'next/navigation';
-import Head from 'next/head';
+"use client";
+import styled from "styled-components";
+import { useRouter } from "next/navigation";
+import Head from "next/head";
 
 const LandingPageContainer = styled.div`
   display: flex;
@@ -9,12 +9,12 @@ const LandingPageContainer = styled.div`
   height: 100vh;
   justify-content: space-between;
   align-items: center;
-  font-family: 'Merriweather', Georgia, serif;
-  background-image: url('/images/journal-bg-image.jpg');
+  font-family: "Merriweather", Georgia, serif;
+  background-image: url("/images/journal-bg-image.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  `;
+`;
 
 const Header = styled.header`
   width: 100%;
@@ -97,7 +97,7 @@ const LandingPage: React.FC = () => {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push('/sign-up');
+    router.push("/sign-up");
   };
 
   return (
@@ -115,12 +115,15 @@ const LandingPage: React.FC = () => {
         <Body>
           <BodyTitle>Welcome to the Journal App!</BodyTitle>
           <Text>
-            This is a tool that analyses users&apos; emotions based on their journal entries and logs the data to plot graphs related to the same.
+            This is a tool that analyses users&apos; emotions based on their
+            journal entries and logs the data to plot graphs related to the
+            same.
           </Text>
           <Button onClick={handleStart}>Let&apos;s get started!</Button>
         </Body>
         <Footer>© 2024 MindScribe App. All rights reserved.</Footer>
-      </LandingPageContainer></>
+      </LandingPageContainer>
+    </>
   );
 };
 

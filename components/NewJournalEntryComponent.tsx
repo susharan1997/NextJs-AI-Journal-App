@@ -1,8 +1,8 @@
-'use client';
-import styled from 'styled-components';
-import { useRouter } from 'next/navigation'
-import { newEntry } from '@/utils/api';
-import useUserStore from '@/store/useStore';
+"use client";
+import styled from "styled-components";
+import { useRouter } from "next/navigation";
+import { newEntry } from "@/utils/api";
+import useUserStore from "@/store/useStore";
 
 const Container = styled.div`
   cursor: pointer;
@@ -13,7 +13,7 @@ const Container = styled.div`
   width: 150px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
-  font-family: 'Merriweather', Georgia, serif;
+  font-family: "Merriweather", Georgia, serif;
 `;
 
 const Content = styled.div`
@@ -33,13 +33,12 @@ const Title = styled.span`
 `;
 
 const NewJournalEntryComponent = () => {
-
   const router = useRouter();
   const userData = useUserStore((state) => state.getUser());
 
   const handleOnClick = async () => {
     if (!userData) {
-      console.log('User data not available');
+      console.log("User data not available");
       return;
     }
 
@@ -49,7 +48,7 @@ const NewJournalEntryComponent = () => {
         router.push(`/journal/${data._id}`);
       } else {
         console.log(`Invalid data response: ${data}`);
-        throw new Error('Invalid data response!');
+        throw new Error("Invalid data response!");
       }
     } catch (error) {
       console.error(`Error creating new entry: ${error}`);

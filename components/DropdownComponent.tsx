@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useRouter } from 'next/navigation';
-import Banner from './Banner';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useRouter } from "next/navigation";
+import Banner from "./Banner";
 
 const DropdownContainer = styled.div`
   display: inline-block;
@@ -13,12 +13,12 @@ const DropdownButton = styled.div`
 `;
 
 const DropdownContent = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'isOpen',
-}) <{ isOpen: boolean }>`
-  display: ${(props) => (props.isOpen ? 'block' : 'none')};
+  shouldForwardProp: (prop) => prop !== "isOpen",
+})<{ isOpen: boolean }>`
+  display: ${(props) => (props.isOpen ? "block" : "none")};
   position: absolute;
   background-color: white;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   min-width: 160px;
   z-index: 1;
   top: 120%;
@@ -36,7 +36,6 @@ const DropdownItem = styled.a`
   &:hover {
     background-color: #ddd;
     border-radius: 5px;
-    
   }
 `;
 
@@ -65,28 +64,27 @@ const DropdownComponent: React.FC = () => {
   const handleToggle = () => setIsOpen(!isOpen);
 
   const handleLogout = async () => {
-    try{
-      const res = await fetch(new Request('/api/sign-out'), {
-        method: 'POST',
+    try {
+      const res = await fetch(new Request("/api/sign-out"), {
+        method: "POST",
       });
 
-      if(res.ok){
-        setMessage('Logout successful!');
+      if (res.ok) {
+        setMessage("Logout successful!");
         setShowBanner(true);
         setTimeout(() => setShowBanner(false), 3000);
-        router.push('/');
-      }
-      else{
+        router.push("/");
+      } else {
         throw new Error(`Response not OK: ${res.status}`);
       }
-    }catch(error){
-      console.log('Error logging out', error);
+    } catch (error) {
+      console.log("Error logging out", error);
     }
   };
 
   return (
     <DropdownContainer>
-      <Banner message={message || ''} show={showBanner} />
+      <Banner message={message || ""} show={showBanner} />
       <DropdownButton onClick={handleToggle}>
         <UserProfileIcon>
           <svg viewBox="0 0 24 24">

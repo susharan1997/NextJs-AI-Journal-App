@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const JournalContentSpinner = styled.div`
   width: 30px;

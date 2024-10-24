@@ -1,4 +1,4 @@
-import mongoose, {Mongoose, ConnectOptions} from 'mongoose';
+import mongoose, { Mongoose, ConnectOptions } from "mongoose";
 
 declare global {
   var mongoose: {
@@ -10,7 +10,9 @@ declare global {
 const MONGODB_URI: string = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error(
+    "Please define the MONGODB_URI environment variable inside .env.local"
+  );
 }
 
 let cached = global.mongoose;

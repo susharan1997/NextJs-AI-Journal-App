@@ -1,9 +1,9 @@
-'use client';
-import styled from 'styled-components';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { validationSchema } from './form';
+"use client";
+import styled from "styled-components";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { validationSchema } from "./form";
 
 const SignUpContainer = styled.div`
   display: flex;
@@ -16,7 +16,7 @@ const SignUpContainer = styled.div`
 
 const Title = styled.h1`
   margin-bottom: 20px;
-  font-family: 'Merriweather', Georgia, serif;
+  font-family: "Merriweather", Georgia, serif;
   color: #333;
 `;
 
@@ -60,7 +60,7 @@ const Button = styled.button`
   }
 `;
 
-const SignInLinkButton = styled.button` 
+const SignInLinkButton = styled.button`
   color: #28a745;
   background: none;
   border: none;
@@ -83,29 +83,32 @@ const SignUp = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (values: {name: string, email: string, password: string, retypePassword: string}) => {
-
+  const handleSubmit = async (values: {
+    name: string;
+    email: string;
+    password: string;
+    retypePassword: string;
+  }) => {
     try {
-      const res = await fetch('/api/sign-up', {
-        method: 'POST',
+      const res = await fetch("/api/sign-up", {
+        method: "POST",
         headers: {
-          'Content-type': 'application/json',
+          "Content-type": "application/json",
         },
         body: JSON.stringify(values),
-      })
+      });
 
-      console.log('Request sent, awaiting response...');
+      console.log("Request sent, awaiting response...");
 
       const data = await res.json();
       if (res.ok) {
-        router.push('/sign-in?message=User created successfully!');
-      }
-      else {
+        router.push("/sign-in?message=User created successfully!");
+      } else {
         setError(data.error);
       }
     } catch (error) {
-      console.error('Error during fetch:', error);
-      setError('Something went wrong. Please try again.');
+      console.error("Error during fetch:", error);
+      setError("Something went wrong. Please try again.");
     }
   };
 
@@ -113,28 +116,50 @@ const SignUp = () => {
     <SignUpContainer>
       <Title>Sign Up</Title>
       <Formik
-        initialValues={{name: '', email: '', password: '', retypePassword: ''}}
+        initialValues={{
+          name: "",
+          email: "",
+          password: "",
+          retypePassword: "",
+        }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({isSubmitting}) => (
+        {({ isSubmitting }) => (
           <FormContainer>
-          <ErrorMessage name='name' component={ErrorText}/>
-          <Input name='name' type="text" placeholder="Name" required />
-          
-          <ErrorMessage name='email' component={ErrorText}/>
-          <Input name='email' type="email" placeholder="Email" required />
-          
-          <ErrorMessage name='password' component={ErrorText}/>
-          <Input name='password' type="password" placeholder="Password" required />
-          
-          <ErrorMessage name='retypePassword' component={ErrorText}/>
-          <Input name='retypePassword' type="password" placeholder="Re-enter Password" required />
+            <ErrorMessage name="name" component={ErrorText} />
+            <Input name="name" type="text" placeholder="Name" required />
 
-          {error && <ErrorText>{error}</ErrorText>}
-          <Button type="submit" disabled={isSubmitting}>Sign Up</Button>
-          <span>Already a member ? <SignInLinkButton onClick={() => router.push('/sign-in')}>sign-in</SignInLinkButton></span>
-        </FormContainer>
+            <ErrorMessage name="email" component={ErrorText} />
+            <Input name="email" type="email" placeholder="Email" required />
+
+            <ErrorMessage name="password" component={ErrorText} />
+            <Input
+              name="password"
+              type="password"
+              placeholder="Password"
+              required
+            />
+
+            <ErrorMessage name="retypePassword" component={ErrorText} />
+            <Input
+              name="retypePassword"
+              type="password"
+              placeholder="Re-enter Password"
+              required
+            />
+
+            {error && <ErrorText>{error}</ErrorText>}
+            <Button type="submit" disabled={isSubmitting}>
+              Sign Up
+            </Button>
+            <span>
+              Already a member ?{" "}
+              <SignInLinkButton onClick={() => router.push("/sign-in")}>
+                sign-in
+              </SignInLinkButton>
+            </span>
+          </FormContainer>
         )}
       </Formik>
     </SignUpContainer>

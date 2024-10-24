@@ -1,12 +1,12 @@
-'use client';
-import Link from 'next/link';
-import styled from 'styled-components';
-import DropdownComponent from '@/components/DropdownComponent';
-import React, { Suspense, useEffect, useState } from 'react';
-import { userDataType } from '@/types';
+"use client";
+import Link from "next/link";
+import styled from "styled-components";
+import DropdownComponent from "@/components/DropdownComponent";
+import React, { Suspense, useEffect, useState } from "react";
+import { userDataType } from "@/types";
 
 const Container = styled.div`
-  font-family: 'Merriweather', Georgia, serif;
+  font-family: "Merriweather", Georgia, serif;
   display: flex;
   justify-content: flex-end;
 `;
@@ -26,7 +26,7 @@ const Sidebar = styled.aside`
 
 const Logo = styled.div`
   margin: 16px 0;
-  font-size: 24px;  
+  font-size: 24px;
   font-weight: bold;
   color: #343a40;
 `;
@@ -39,7 +39,7 @@ const NavItem = styled.li`
   font-size: 18px;
   margin: 12px 0;
   list-style: none;
-  
+
   a {
     text-decoration: none;
     color: #007bff;
@@ -47,7 +47,7 @@ const NavItem = styled.li`
     border: 100%;
     border-radius: 0.5em;
     padding: 8px 16px;
-    
+
     &:hover {
       color: #0056b3;
       background-color: #f1f1f1;
@@ -105,25 +105,24 @@ const UserTitle = styled.span`
 
 const links = [
   {
-    name: 'Journals',
-    href: '/journal',
+    name: "Journals",
+    href: "/journal",
   },
   {
-    name: 'Graph Analysis',
-    href: '/history',
+    name: "Graph Analysis",
+    href: "/history",
   },
   {
-    name: 'Questions',
-    href: '/previous-questions',
-  }
-]
+    name: "Questions",
+    href: "/previous-questions",
+  },
+];
 
 const DashboardLayout = ({ children }: any) => {
-
   const [user, setUser] = useState<userDataType | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -143,9 +142,7 @@ const DashboardLayout = ({ children }: any) => {
       </Sidebar>
       <Main>
         <Header>
-          <UserTitle>
-            {` Welcome ${user?.name} (${user?.id})`}
-          </UserTitle>
+          <UserTitle>{` Welcome ${user?.name} (${user?.id})`}</UserTitle>
           <Nav>
             <NavContent>
               <DropdownComponent />
@@ -153,13 +150,11 @@ const DashboardLayout = ({ children }: any) => {
           </Nav>
         </Header>
         <Content>
-          <Suspense fallback={<div>Loading...</div>}>
-            {children}
-          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         </Content>
       </Main>
     </Container>
-  )
+  );
 };
 
 export default DashboardLayout;

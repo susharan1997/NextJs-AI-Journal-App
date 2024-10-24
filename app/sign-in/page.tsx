@@ -1,8 +1,8 @@
-'use client';
-import styled from 'styled-components';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Banner from '@/components/Banner';
+"use client";
+import styled from "styled-components";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Banner from "@/components/Banner";
 
 const SignInContainer = styled.div`
   display: flex;
@@ -15,7 +15,7 @@ const SignInContainer = styled.div`
 
 const Title = styled.h1`
   margin-bottom: 20px;
-  font-family: 'Merriweather', Georgia, serif;
+  font-family: "Merriweather", Georgia, serif;
   color: #333;
 `;
 
@@ -61,13 +61,13 @@ const Button = styled.button`
 
 function SignIn() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>('');
+  const [error, setError] = useState<string | null>("");
   const [message, setMessage] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const msg = urlParams.get('message');
+    const msg = urlParams.get("message");
     if (msg) {
       setMessage(msg);
       setShowBanner(true);
@@ -81,42 +81,47 @@ function SignIn() {
     const password = (event.target as HTMLFormElement).password.value;
 
     try {
-      const response = await fetch('/api/authenticate', {
-        method: 'POST',
+      const response = await fetch("/api/authenticate", {
+        method: "POST",
         headers: {
-          'Content-type': 'application/json',
+          "Content-type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('user', JSON.stringify({ id: data.user.id, name: data.user.name }));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: data.user.id, name: data.user.name })
+        );
         router.push(`/journal`);
-      }
-      else {
+      } else {
         setError(data.error);
       }
-    }
-    catch (error) {
-      setError('An error occurred. Please try again!');
+    } catch (error) {
+      setError("An error occurred. Please try again!");
     }
   };
 
   return (
     <SignInContainer>
-      <Banner message={message || ''} show={showBanner} />
+      <Banner message={message || ""} show={showBanner} />
       <Title>Sign In</Title>
       <Form onSubmit={handleSubmit}>
-        <Input type="email" placeholder="Email" name='email' required />
-        <Input type="password" placeholder="Password" name='password' required />
+        <Input type="email" placeholder="Email" name="email" required />
+        <Input
+          type="password"
+          placeholder="Password"
+          name="password"
+          required
+        />
         {error && <span>{error}</span>}
         <Button type="submit">Sign In</Button>
       </Form>
     </SignInContainer>
-
   );
-};
+}
 
 export default SignIn;

@@ -1,8 +1,10 @@
-'use client';
-import styled from 'styled-components';
+"use client";
+import styled from "styled-components";
 
-const BannerContainer = styled.div.withConfig({shouldForwardProp: (prop) => prop!== 'show'})<{ show: boolean }>`
-  display: ${props => (props.show ? 'flex' : 'none')};
+const BannerContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "show",
+})<{ show: boolean }>`
+  display: ${(props) => (props.show ? "flex" : "none")};
   align-items: center;
   justify-content: space-between;
   width: 80%;
@@ -36,7 +38,8 @@ const Banner: React.FC<BannerProps> = ({ message, show }) => {
   return (
     <BannerContainer show={show}>
       <Message>{message}</Message>
-    </BannerContainer>)
+    </BannerContainer>
+  );
 };
 
 export default Banner;
