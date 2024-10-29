@@ -151,11 +151,15 @@ function JournalComponent() {
       return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     };
 
-    const filteredEntries = entries?.filter((entry) => {
+    const filteredEntries = entries?.filter((entry, index) => {
       const entryDate = stripTime(new Date(entry.createdAt));
-      return (
-        entryDate >= stripTime(startDate) && entryDate <= stripTime(endDate)
-      );
+      const filteredDate =
+        entryDate >= stripTime(startDate) && entryDate <= stripTime(endDate);
+      const filteredScore = entry?.analysis?.sentimentScore! >= selectedScore!;
+      const filteredEmotion =
+        !emotionType || entry.analysis?.mood === emotionType;
+
+      return filteredDate && filteredScore && filteredEmotion;
     });
 
     if (filteredEntries && filteredEntries.length > 0) {
@@ -173,14 +177,14 @@ function JournalComponent() {
     setEndDate(null);
     setFilteredEntries(null);
     setEmptyMsg(false);
+    setEmotionType("");
+    setSelectedScore(null);
   };
 
-  const handleSlider = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleSlider = (e: any) => {
     setSelectedScore(Number(e.target.value));
   };
-  console.log(emotionType, "EMOTION SELECT");
   const handleEmotionSelect = (e: ChangeEvent<HTMLSelectElement>) => {
-    console.log(e.target.value, "SELECT");
     setEmotionType(e.target.value);
   };
 

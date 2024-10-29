@@ -78,6 +78,24 @@ const StyledSlider = styled.input`
   width: 200px;
 `;
 
+const StyledSliderWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px; // Space between the slider and the selected value
+`;
+
+const SliderLabel = styled.span`
+  font-size: 1rem;
+  color: black;
+`;
+
+const SliderValuesContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 250px; // Same width as the slider
+`;
+
 const StyledEmotionSelect = styled.select`
   width: 250px;
   height: 40px;
@@ -101,6 +119,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   if (!journal) {
     console.log("Invalid journal entries encountered!:", journal);
   }
+  const formattedScore = selectedScore ? selectedScore.toFixed(2) : 0;
 
   return (
     <SearchContainer>
@@ -119,25 +138,33 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
           placeholder="Enter the end date"
           onChange={handleDate}
         />
-        <StyledSlider
-          id="score-slider"
-          type="range"
-          min="-10"
-          max="10"
-          onChange={handleSlider}
-          value={selectedScore!}
-        />
+        <StyledSliderWrapper>
+          <SliderLabel>Selected Score: {formattedScore}</SliderLabel>
+          <StyledSlider
+            id="score-slider"
+            type="range"
+            min="-10"
+            max="10"
+            step={0.5}
+            onChange={handleSlider}
+            value={selectedScore!}
+          />
+          <SliderValuesContainer>
+            <SliderLabel>-10</SliderLabel>
+            <SliderLabel>10</SliderLabel>
+          </SliderValuesContainer>
+        </StyledSliderWrapper>
         <StyledEmotionSelect
           id="emotion-select"
           value={emotionType}
           onChange={handleEmotionSelect}
         >
           <option value="">Select Emotion Category</option>
-          <option value="happy">Happy</option>
-          <option value="sad">Sad</option>
-          <option value="mixed emotions">Mixed Emotions</option>
-          <option value="exhausted">Exhausted</option>
-          <option value="others">Others</option>
+          <option value="Mixed emotions">Mixed Emotions</option>
+          <option value="Exhausted">Exited</option>
+          <option value="Nostalgic">Nostalgic</option>
+          <option value="Anxious">Anxious</option>
+          <option value="Joyful">Joyful</option>
         </StyledEmotionSelect>
         <SearchButton type="submit">Search</SearchButton>
         <ClearButton id="clear-btn" onClick={handleClear}>
