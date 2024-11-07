@@ -70,7 +70,7 @@ function JournalComponent() {
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [selectedScore, setSelectedScore] = useState<number | null>(null);
+  const [selectedScore, setSelectedScore] = useState<number>(-10);
   const [emotionType, setEmotionType] = useState<string>("");
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -140,12 +140,6 @@ function JournalComponent() {
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!startDate || !endDate) {
-      setMessage("Please select both start and end dates!");
-      setShowBanner(true);
-      setTimeout(() => setShowBanner(false), 3000);
-      return;
-    }
 
     const stripTime = (date: Date) => {
       return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -153,19 +147,32 @@ function JournalComponent() {
 
     const filteredEntries = entries?.filter((entry, index) => {
       const entryDate = stripTime(new Date(entry.createdAt));
-      const filteredDate =
-        entryDate >= stripTime(startDate) && entryDate <= stripTime(endDate);
-      const filteredScore = entry?.analysis?.sentimentScore! >= selectedScore!;
-      const filteredEmotion =
-        !emotionType || entry.analysis?.mood === emotionType;
+      const isWithinDateRange =
+        startDate && !endDate
+          ? entryDate >= stripTime(startDate)
+          : startDate && endDate
+          ? entryDate >= stripTime(startDate) && entryDate <= stripTime(endDate)
+          : true;
 
-      return filteredDate && filteredScore && filteredEmotion;
+      const isWithinScore =
+        selectedScore !== null &&
+        selectedScore !== undefined &&
+        entry?.analysis?.sentimentScore
+          ? entry?.analysis?.sentimentScore >= selectedScore
+          : true;
+
+      const isMatchingEmotion =
+        emotionType && entry?.analysis?.mood
+          ? entry?.analysis?.mood.toLowerCase() === emotionType.toLowerCase()
+          : true;
+
+      return isWithinDateRange && isMatchingEmotion && isWithinScore;
     });
 
     if (filteredEntries && filteredEntries.length > 0) {
       setFilteredEntries(filteredEntries);
       setEmptyMsg(false);
-    } else {
+    } else {6
       setFilteredEntries([]);
       setEmptyMsg(true);
     }
@@ -178,7 +185,7 @@ function JournalComponent() {
     setFilteredEntries(null);
     setEmptyMsg(false);
     setEmotionType("");
-    setSelectedScore(null);
+    setSelectedScore(-10);
   };
 
   const handleSlider = (e: any) => {
@@ -209,8 +216,8 @@ function JournalComponent() {
         handleSlider={handleSlider}
         handleSearch={(e) => handleSearch(e)}
         handleEmotionSelect={(e) => handleEmotionSelect(e)}
-        startDate={isoStringFormat(startDate!)}
-        endDate={isoStringFormat(endDate!)}
+        startDate={startDate ? isoStringFormat(startDate) : ""}
+        endDate={endDate ? isoStringFormat(endDate) : ""}
         selectedScore={selectedScore}
         emotionType={emotionType}
       />

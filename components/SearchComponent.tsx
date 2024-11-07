@@ -161,9 +161,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         >
           <option value="">Select Emotion Category</option>
           <option value="Mixed emotions">Mixed Emotions</option>
-          <option value="Exhausted">Exited</option>
+          <option value="Excited">Excited</option>
           <option value="Nostalgic">Nostalgic</option>
-          <option value="Anxious">Anxious</option>
+          <option value="Exhilarated">Exhilarated</option>
           <option value="Joyful">Joyful</option>
         </StyledEmotionSelect>
         <SearchButton type="submit">Search</SearchButton>

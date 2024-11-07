@@ -125,26 +125,4 @@ export const qa = async (journals: JournalEntryType[], question: string) => {
     result.output_text ||
     "No sufficient information found to answer your question."
   );
-
-  // const batchSize = 3;
-  // let refinedAnswer = '';
-  // const refinedPromises = [];
-
-  // for (let i = 0; i < docs.length; i += batchSize) {
-  //     const batch = docs.slice(i, i + batchSize);
-  //     const relevantEntries = batch.map(doc => doc.document.pageContent).join("\n\n");
-  //     refinedPromises.push(chain.invoke({
-  //         input_documents: batch,
-  //         question: refinedAnswer
-  //             ? `${refinedAnswer}\nAdditional context:\n${relevantEntries}`
-  //             : refinedPrompt.replace("{relevantEntries}", relevantEntries).replace("{question}", question),
-  //     }));
-  // }
-  // console.time('promise process');
-
-  // const results = await Promise.all(refinedPromises);
-  // console.timeEnd('promise process');
-  // refinedAnswer = results.map(result => result.output_text).join('\n\n') || 'No sufficient information found to answer your question.';
-
-  //return refinedAnswer;
 };
