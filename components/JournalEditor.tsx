@@ -9,6 +9,9 @@ import EditorBanner from "./EditorBanner";
 import { EntryAnalysisType } from "@/types";
 import { useFormattedColors } from "@/utils/useFormattedColors";
 import useUserStore from "@/store/useStore";
+import { jsPDF } from "jspdf";
+import { Document, Packer, Paragraph } from "docx";
+import saveAs from "file-saver";
 
 interface journalEditorPropType {
   journal: EntryAnalysisType | null;
@@ -160,6 +163,7 @@ const DialogButton = styled.button`
 
 const CancelButton = styled(DialogButton)`
   background-color: #ccc;
+
   &:hover {
     background-color: #aaa;
   }
@@ -175,6 +179,22 @@ const UpdateDeleteButtonContainer = styled.div`
   justify-content: space-around;
   align-items: center;
   margin-top: 20px;
+`;
+
+const DownloadButton = styled.button`
+  background-color: #f54556;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 0.5rem;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #b80214;
+  }
 `;
 
 const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
@@ -292,6 +312,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
             <UpdateDeleteButtonContainer>
               <DialogButton onClick={handleConfirmDelete}>Yes</DialogButton>
               <CancelButton onClick={handleCancelDelete}>Cancel</CancelButton>
+              <DownloadButton>Download</DownloadButton>
             </UpdateDeleteButtonContainer>
           </DialogBox>
         </DialogOverlay>
