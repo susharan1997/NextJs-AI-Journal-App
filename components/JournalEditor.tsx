@@ -95,6 +95,11 @@ const DeleteButton = styled.button`
   &: hover {
     background-color: #b80214;
   }
+
+    &: disabled {
+    background-color: grey;
+    cursor: none;
+  }
 `;
 
 const SaveButton = styled.button`
@@ -109,6 +114,11 @@ const SaveButton = styled.button`
 
   &: hover {
     background-color: #1c960c;
+  }
+
+  &: disabled {
+    background-color: grey;
+    cursor: none;
   }
 `;
 
@@ -181,29 +191,79 @@ const UpdateDeleteButtonContainer = styled.div`
   margin-top: 20px;
 `;
 
+const DownloadComponentContainer = styled.div`
+  position: relative;
+  display: inline-block;
+  border-radius: 5px;
+`;
+
 const DownloadButton = styled.button`
-  background-color: #f54556;
+  position: relative;
+  width: 130px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background-color: #24ace3;
   color: #fff;
-  border: none;
   padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
   border-radius: 5px;
-  margin: 0 0.5rem;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #b80214;
+    background-color: #006994;
+  }
+
+  &: disabled {
+    background-color: grey;
+    cursor: none;
+  }
+`;
+
+const ButtonText = styled.span`
+  color: white;
+`;
+
+const DownloadItemsContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "isOpen",
+})<{ isOpen: boolean }>`
+  position: absolute;
+  display: ${(props) => (props.isOpen ? "block" : "none")};
+  width: 120px;
+  top: 100%;
+  right: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  z-index: 1;
+`;
+
+const DownloadItem = styled.div`
+  width: 100%;
+  height: 35px;
+  border-radius: 5px;
+  border: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  padding-inline: 35px;
+  background-color: white;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+
+  &: hover {
+    background-color: #e9ecef;
+    cursor: pointer;
   }
 `;
 
 const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
   const [text, setText] = useState("New content");
   const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string | null>(null);
-  const [showBanner, setShowBanner] = useState(false);
+  const [showBanner, setShowBanner] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [analysis, setAnalysis] = useState<emotionTypes>({
     subject: "",
     mood: "",
@@ -213,6 +273,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
   const router = useRouter();
   const moodColor = useFormattedColors(currentJournal?.color!);
   const userData = useUserStore((state) => state.getUser());
+  const downloadItemsList = ["PDF", "Word"];
 
   useEffect(() => {
     if (journal) {
@@ -302,6 +363,63 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
     }
   };
 
+  const handleDownload = (item: string) => {
+    setOpen(false);
+    if (item === "PDF") handleDownloadPdf();
+    else if (item === "Word") handleDownloadWord();
+  };
+
+  const handleDownloadPdf = () => {
+    const doc = new jsPDF();
+    const margin = 10;
+    const pageHeight = doc.internal.pageSize.height;
+
+    doc.setFontSize(16);
+    doc.text("Journal Entry", margin, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Subject: ${analysis.subject}`, margin, 30);
+    doc.text(`Mood: ${analysis.mood}`, margin, 40);
+
+    const content = `Content: ${text}`;
+    const contentLines = doc.splitTextToSize(
+      content,
+      doc.internal.pageSize.width - margin * 2
+    );
+
+    let y = 50;
+    contentLines.forEach((line: any) => {
+      if (y > pageHeight - margin) {
+        doc.addPage();
+        y = margin + 10; // Start at a new line on the next page
+      }
+      doc.text(line, margin, y);
+      y += 7; // Line height adjustment
+    });
+
+    doc.save(`${analysis.subject || "journal"}.pdf`);
+  };
+
+  const handleDownloadWord = async () => {
+    const doc = new Document({
+      sections: [
+        {
+          children: [
+            new Paragraph({
+              text: "Journal Entry",
+              heading: "Heading1",
+            }),
+            new Paragraph(`Subject: ${analysis.subject}`),
+            new Paragraph(`Mood: ${analysis.mood}`),
+            new Paragraph(`Content: ${text}`),
+          ],
+        },
+      ],
+    });
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `${analysis.subject || "journal"}.docx`);
+  };
+
   return (
     <Container>
       <EditorBanner message={message || ""} show={showBanner} />
@@ -312,7 +430,6 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
             <UpdateDeleteButtonContainer>
               <DialogButton onClick={handleConfirmDelete}>Yes</DialogButton>
               <CancelButton onClick={handleCancelDelete}>Cancel</CancelButton>
-              <DownloadButton>Download</DownloadButton>
             </UpdateDeleteButtonContainer>
           </DialogBox>
         </DialogOverlay>
@@ -354,8 +471,36 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
           </AnalysisListItem>
           <AnalysisListItem>
             <ButtonContainer>
-              <SaveButton onClick={handleSave}>Update</SaveButton>
-              <DeleteButton onClick={handleDeleteClick}>Delete</DeleteButton>
+              <SaveButton onClick={handleSave} disabled={isLoading || isSaving}>
+                Update
+              </SaveButton>
+              <DeleteButton onClick={handleDeleteClick} disabled={isLoading || isSaving}>
+                Delete
+              </DeleteButton>
+              <DownloadComponentContainer>
+                <DownloadButton
+                  onClick={() => setOpen((prev) => !prev)}
+                  disabled={isLoading || isSaving}
+                >
+                  <ButtonText>Download</ButtonText>
+                  <img
+                    src="/icons/down-line-svgrepo-com.svg"
+                    alt="Down Arrow"
+                    width="24"
+                    height="24"
+                  />
+                </DownloadButton>
+                <DownloadItemsContainer isOpen={open}>
+                  {downloadItemsList.map((item, index) => (
+                    <DownloadItem
+                      onClick={() => handleDownload(item)}
+                      key={index}
+                    >
+                      {item}
+                    </DownloadItem>
+                  ))}
+                </DownloadItemsContainer>
+              </DownloadComponentContainer>
             </ButtonContainer>
           </AnalysisListItem>
         </AnalysisList>
