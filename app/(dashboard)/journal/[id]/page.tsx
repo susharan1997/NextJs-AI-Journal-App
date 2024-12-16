@@ -15,8 +15,8 @@ const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
     null
   );
   const userData = useUserStore((state) => state.getUser());
-
-  useEffect(() => {
+  
+  const refreshJournal = async () => {
     const journalId = params?.id;
     if (userData && journalId) {
       const fetchEntry = async () => {
@@ -36,11 +36,15 @@ const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
       };
       fetchEntry();
     }
+  }
+
+  useEffect(() => {
+    refreshJournal();
   }, [userData, params]);
 
   return (
     <div>
-      <JournalEditor journal={entryAnalysis} />
+      <JournalEditor journal={entryAnalysis} refreshJournal={refreshJournal} />
     </div>
   );
 };

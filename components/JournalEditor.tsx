@@ -15,6 +15,7 @@ import saveAs from "file-saver";
 
 interface journalEditorPropType {
   journal: EntryAnalysisType | null;
+  refreshJournal: () => void;
 }
 
 interface emotionTypes {
@@ -292,11 +293,13 @@ const StyledRecordSvg = styled.svg.withConfig({
   height: 24px;
 
   .recording-dot {
-    animation: ${({ isRecording }) => (isRecording ? "blink 1.5s infinite" : "none")};
+    animation: ${({ isRecording }) =>
+      isRecording ? "blink 1.5s infinite" : "none"};
   }
 
   @keyframes blink {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -305,7 +308,10 @@ const StyledRecordSvg = styled.svg.withConfig({
   }
 `;
 
-const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
+const JournalEditor: React.FC<journalEditorPropType> = ({
+  journal,
+  refreshJournal,
+}) => {
   const [text, setText] = useState("New content");
   const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -369,7 +375,6 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
       recognition.interimResults = false;
 
       recognition.onresult = (event: any) => {
-        console.log(cursorPos, "CURSOR POS");
         let transcript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
@@ -383,12 +388,10 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
         }
 
         if (transcript) {
-          console.log(transcript, "TRANSCRIPT");
           setText((prevText) => {
             if (textAreaRef.current) {
               const start = textAreaRef.current!.selectionStart;
               const end = textAreaRef.current!.selectionEnd;
-              console.log(cursorPos, "CURSOR POS WHILE SETTING TEXT");
 
               const newText =
                 prevText.slice(0, start) + transcript + prevText.slice(end);
@@ -398,7 +401,6 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
 
               return newText;
             }
-            console.log(cursorPos, "NEW CURSOR POS");
             return prevText + transcript;
           });
         }
@@ -437,10 +439,6 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
 
   const handleCursorChange = () => {
     if (textAreaRef.current) {
-      console.log(
-        textAreaRef.current.selectionStart,
-        "CURSOR POS -> CURSOR HANDLER"
-      );
       setCursorPos(textAreaRef.current.selectionStart);
     }
   };
@@ -509,6 +507,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
         setMessage("Journal updated!");
         setShowBanner(true);
         setTimeout(() => setShowBanner(false), 2000);
+        refreshJournal();
       } else {
         console.error("Failed to update journal or no data returned:", res);
       }
