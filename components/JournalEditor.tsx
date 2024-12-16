@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import Spinner from "./Spinner";
 import { deleteJournal, updateJournal } from "@/utils/api";
@@ -96,7 +96,7 @@ const DeleteButton = styled.button`
     background-color: #b80214;
   }
 
-    &: disabled {
+  &: disabled {
     background-color: grey;
     cursor: none;
   }
@@ -137,6 +137,7 @@ const DialogOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 `;
 
 const DialogBox = styled.div`
@@ -216,7 +217,7 @@ const DownloadButton = styled.button`
     background-color: #006994;
   }
 
-  &: disabled {
+  &:disabled {
     background-color: grey;
     cursor: none;
   }
@@ -246,13 +247,61 @@ const DownloadItem = styled.div`
   border: 1px solid #e9ecef;
   display: flex;
   align-items: center;
-  padding-inline: 35px;
+  justify-content: center;
   background-color: white;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 
   &: hover {
     background-color: #e9ecef;
     cursor: pointer;
+  }
+`;
+
+const RecordButton = styled.button`
+  position: absolute;
+  top: 10px;
+  left: 40em;
+  width: 120px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background-color: #e9ecef;
+  color: black;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid red;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #c8cacc;
+  }
+
+  &:disabled {
+    background-color: grey;
+    cursor: none;
+  }
+`;
+
+const StyledRecordSvg = styled.svg.withConfig({
+  shouldForwardProp: (prop) => prop !== "isRecording",
+})<{ isRecording: boolean }>`
+  width: 24px;
+  height: 24px;
+
+  .recording-dot {
+    animation: ${({ isRecording }) => (isRecording ? "blink 1.5s infinite" : "none")};
+  }
+
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
   }
 `;
 
@@ -273,13 +322,31 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
   const router = useRouter();
   const moodColor = useFormattedColors(currentJournal?.color!);
   const userData = useUserStore((state) => state.getUser());
+  const recognitionRef = useRef<any | null>(null);
+  const [cursorPos, setCursorPos] = useState<number>(0);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
   const downloadItemsList = ["PDF", "Word"];
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) recognitionRef.current.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.selectionStart = cursorPos;
+      textAreaRef.current.selectionEnd = cursorPos;
+    }
+  }, [cursorPos, text]);
 
   useEffect(() => {
     if (journal) {
       const journalContent = journal?.entryId?.content ?? "";
       setText(journalContent);
       setJournal(journal);
+      setCursorPos(journalContent.length);
       setAnalysis({
         subject: journal?.subject ?? "No Subject",
         mood: journal?.mood ?? "No Mood",
@@ -287,7 +354,96 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
       });
       setIsLoading(false);
     }
-  }, [journal]);
+  }, [journal, currentJournal]);
+
+  const handleStartRecord = () => {
+    if (!recognitionRef.current) {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        console.log("Speech recognition not supported in this browser!.");
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+
+      recognition.onresult = (event: any) => {
+        console.log(cursorPos, "CURSOR POS");
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            transcript += result[0].transcript;
+          }
+        }
+
+        if (textAreaRef.current) {
+          textAreaRef.current.focus();
+        }
+
+        if (transcript) {
+          console.log(transcript, "TRANSCRIPT");
+          setText((prevText) => {
+            if (textAreaRef.current) {
+              const start = textAreaRef.current!.selectionStart;
+              const end = textAreaRef.current!.selectionEnd;
+              console.log(cursorPos, "CURSOR POS WHILE SETTING TEXT");
+
+              const newText =
+                prevText.slice(0, start) + transcript + prevText.slice(end);
+
+              const newCursorPos = start + transcript.length;
+              setCursorPos(newCursorPos);
+
+              return newText;
+            }
+            console.log(cursorPos, "NEW CURSOR POS");
+            return prevText + transcript;
+          });
+        }
+      };
+
+      recognition.onerror = (error: any) => {
+        console.error("Speech recognition error: ", error.message);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+
+    recognitionRef.current?.start();
+    setIsRecording(true);
+  };
+
+  const handleStopRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const handleRecord = () => {
+    if (isRecording) handleStopRecording();
+    else handleStartRecord();
+  };
+
+  const handleCursorChange = () => {
+    if (textAreaRef.current) {
+      console.log(
+        textAreaRef.current.selectionStart,
+        "CURSOR POS -> CURSOR HANDLER"
+      );
+      setCursorPos(textAreaRef.current.selectionStart);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -374,9 +530,15 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
     const margin = 10;
     const pageHeight = doc.internal.pageSize.height;
 
+    doc.setProperties({
+      title: `${analysis.subject || "Journal Entry"}`,
+      subject: analysis.subject,
+      author: userData?.name || "Unknown author",
+      keywords: "Journal, entry, analysis",
+    });
+
     doc.setFontSize(16);
     doc.text("Journal Entry", margin, 20);
-
     doc.setFontSize(12);
     doc.text(`Subject: ${analysis.subject}`, margin, 30);
     doc.text(`Mood: ${analysis.mood}`, margin, 40);
@@ -445,13 +607,52 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
           </div>
         )}
       </SpinnerContainer>
+      <RecordButton onClick={handleRecord} disabled={isLoading || isSaving}>
+        {isRecording ? "Stop" : "Speak"}
+        {isRecording ? (
+          <StyledRecordSvg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            isRecording={true}
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="red"
+              strokeWidth="2"
+              fill="none"
+            />
+            <circle
+              className="recording-dot"
+              cx="12"
+              cy="12"
+              r="5"
+              fill="red"
+            />
+          </StyledRecordSvg>
+        ) : (
+          <img
+            src="/icons/mic-svgrepo-com.svg"
+            alt="Microphone"
+            width="24"
+            height="24"
+          />
+        )}
+      </RecordButton>
       <EditorContainer>
         {isLoading ? (
           <TextSpinnerContainer>
             <JournalContentSpinner />
           </TextSpinnerContainer>
         ) : (
-          <TextArea value={text} onChange={handleJournalUpdate} />
+          <TextArea
+            value={text}
+            onChange={handleJournalUpdate}
+            onClick={handleCursorChange}
+            onKeyUp={handleCursorChange}
+            onInput={handleCursorChange}
+          />
         )}
       </EditorContainer>
       <AnalysisContainer>
@@ -474,7 +675,10 @@ const JournalEditor: React.FC<journalEditorPropType> = ({ journal }) => {
               <SaveButton onClick={handleSave} disabled={isLoading || isSaving}>
                 Update
               </SaveButton>
-              <DeleteButton onClick={handleDeleteClick} disabled={isLoading || isSaving}>
+              <DeleteButton
+                onClick={handleDeleteClick}
+                disabled={isLoading || isSaving}
+              >
                 Delete
               </DeleteButton>
               <DownloadComponentContainer>
