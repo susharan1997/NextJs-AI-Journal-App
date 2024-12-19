@@ -327,7 +327,6 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
   const moodColor = useFormattedColors(currentJournal?.color!);
-  const userData = useUserStore((state) => state.getUser());
   const recognitionRef = useRef<any | null>(null);
   const [cursorPos, setCursorPos] = useState<number>(0);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -347,6 +346,8 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
     }
   }, [cursorPos, text]);
 
+  const userData = useUserStore((state) => state.getUser());
+
   useEffect(() => {
     if (journal) {
       const journalContent = journal?.entryId?.content ?? "";
@@ -359,6 +360,8 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
         negative: journal?.negative ?? false,
       });
       setIsLoading(false);
+    } else {
+      refreshJournal();
     }
   }, [journal, currentJournal]);
 

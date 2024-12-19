@@ -42,6 +42,7 @@ export async function POST(
       );
     }
 
+    revalidatePath(`/journal-entry/${params.id}`);
     revalidatePath("/journal");
 
     return NextResponse.json({ entryAnalysis }, { status: 200 });

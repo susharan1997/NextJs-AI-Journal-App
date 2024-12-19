@@ -1,8 +1,7 @@
 "use client";
 import JournalEditor from "@/components/JournalEditor";
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
-import { userDataType } from "@/types";
+import { useCallback, useEffect, useState } from "react";
 import { EntryAnalysisType } from "@/types";
 import useUserStore from "@/store/useStore";
 
@@ -15,8 +14,8 @@ const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
     null
   );
   const userData = useUserStore((state) => state.getUser());
-  
-  const refreshJournal = async () => {
+
+  const refreshJournal = useCallback(async () => {
     const journalId = params?.id;
     if (userData && journalId) {
       const fetchEntry = async () => {
@@ -36,11 +35,11 @@ const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
       };
       fetchEntry();
     }
-  }
+  }, [userData, params]);
 
   useEffect(() => {
-    refreshJournal();
-  }, [userData, params]);
+    if (!entryAnalysis) refreshJournal();
+  }, [userData, params, entryAnalysis]);
 
   return (
     <div>
