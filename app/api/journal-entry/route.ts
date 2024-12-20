@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
     user.entries.push(newJournalEntry._id);
     user.analysis.push(newEntryAnalysis._id);
     await user.save();
-    console.log(newJournalEntry, "NEW JOURNAL ENTRY");
     revalidatePath("/journal");
 
     return NextResponse.json({ data: newJournalEntry }, { status: 200 });

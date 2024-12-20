@@ -150,7 +150,14 @@ export async function PATCH(
     }
 
     return NextResponse.json({
-      data: { ...updateEntry, analysis: analyzedJournalEntry },
+      data: {
+        ...updateEntry.toObject(),
+        entryId: {
+          _id: updateEntry._id,
+          content: updateEntry.content,
+        },
+        analysis: analyzedJournalEntry,
+      },
     });
   } catch (error) {
     console.error(`Error while updating the journal entry: ${error}`);

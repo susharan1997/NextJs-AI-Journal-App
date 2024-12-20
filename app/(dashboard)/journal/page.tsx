@@ -61,7 +61,7 @@ const EmptyText = styled.span`
 function JournalComponent() {
   const [message, setMessage] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(false);
-  const [entries, setEntries] = useState<JournalEntryAnalysisType[] | null>([]);
+  const [entries, setEntries] = useState<JournalEntryAnalysisType[]>([]);
   const [filteredEntries, setFilteredEntries] = useState<
     JournalEntryAnalysisType[] | null
   >(null);
@@ -166,13 +166,15 @@ function JournalComponent() {
           ? entry?.analysis?.mood.toLowerCase() === emotionType.toLowerCase()
           : true;
 
-      return isWithinDateRange && isMatchingEmotion && isWithinScore;
+      return [isWithinDateRange && isMatchingEmotion && isWithinScore].every(
+        Boolean
+      );
     });
 
     if (filteredEntries && filteredEntries.length > 0) {
       setFilteredEntries(filteredEntries);
       setEmptyMsg(false);
-    } else {6
+    } else {
       setFilteredEntries([]);
       setEmptyMsg(true);
     }

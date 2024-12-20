@@ -10,40 +10,15 @@ interface paramsType {
 }
 
 const JournalPageComponent: NextPage<{ params: paramsType }> = ({ params }) => {
-  const [entryAnalysis, setEntryAnalysis] = useState<EntryAnalysisType | null>(
-    null
-  );
-  const userData = useUserStore((state) => state.getUser());
-
-  const refreshJournal = useCallback(async () => {
-    const journalId = params?.id;
-    if (userData && journalId) {
-      const fetchEntry = async () => {
-        try {
-          const response = await fetch(`/api/journal-entry/${journalId}`, {
-            method: "POST",
-            headers: {
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify(userData.id),
-          });
-          const { entryAnalysis } = await response.json();
-          setEntryAnalysis(entryAnalysis);
-        } catch (error) {
-          console.error("Error fetching journal entries:", error);
-        }
-      };
-      fetchEntry();
-    }
-  }, [userData, params]);
+  const setJournalId = useUserStore((state) => state.setJournalId);
 
   useEffect(() => {
-    if (!entryAnalysis) refreshJournal();
-  }, [userData, params, entryAnalysis]);
+    if (params?.id) setJournalId(params?.id);
+  }, [params]);
 
   return (
     <div>
-      <JournalEditor journal={entryAnalysis} refreshJournal={refreshJournal} />
+      <JournalEditor />
     </div>
   );
 };

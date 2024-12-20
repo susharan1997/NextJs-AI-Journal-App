@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Banner from "@/components/Banner";
+import useUserStore from "@/store/useStore";
 
 const SignInContainer = styled.div`
   display: flex;
@@ -64,6 +65,7 @@ function SignIn() {
   const [error, setError] = useState<string | null>("");
   const [message, setMessage] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(false);
+  const setUserData = useUserStore((state) => state.setUser);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -90,12 +92,17 @@ function SignIn() {
       });
 
       const data = await response.json();
+      const jsonItem = JSON.stringify({
+        id: data.user.id,
+        name: data.user.name,
+      });
 
       if (response.ok) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ id: data.user.id, name: data.user.name })
-        );
+        localStorage.setItem("user", jsonItem);
+        setUserData({
+          id: data.user.id,
+          name: data.user.name,
+        });
         router.push(`/journal`);
       } else {
         setError(data.error);

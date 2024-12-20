@@ -13,10 +13,10 @@ import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph } from "docx";
 import saveAs from "file-saver";
 
-interface journalEditorPropType {
-  journal: EntryAnalysisType | null;
-  refreshJournal: () => void;
-}
+// interface journalEditorPropType {
+//   journal: EntryAnalysisType | null;
+//   refreshJournal: () => void;
+// }
 
 interface emotionTypes {
   subject: string;
@@ -308,12 +308,10 @@ const StyledRecordSvg = styled.svg.withConfig({
   }
 `;
 
-const JournalEditor: React.FC<journalEditorPropType> = ({
-  journal,
-  refreshJournal,
-}) => {
-  const [text, setText] = useState("New content");
+const JournalEditor: React.FC = () => {
+  //const [text, setText] = useState("New content");
   const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
+  const [isBrowser, setIsBrowser] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string | null>(null);
@@ -324,6 +322,8 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
     mood: "",
     negative: false,
   });
+  const userData = useUserStore((state) => state.getUser());
+  const journalId = useUserStore((state) => state.getJournalId());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
   const moodColor = useFormattedColors(currentJournal?.color!);
@@ -333,37 +333,44 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const downloadItemsList = ["PDF", "Word"];
 
-  useEffect(() => {
-    return () => {
-      if (recognitionRef.current) recognitionRef.current.stop();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     if (recognitionRef.current) recognitionRef.current.stop();
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.selectionStart = cursorPos;
-      textAreaRef.current.selectionEnd = cursorPos;
+  // useEffect(() => {
+  //   if (textAreaRef.current) {
+  //     textAreaRef.current.selectionStart = cursorPos;
+  //     textAreaRef.current.selectionEnd = cursorPos;
+  //   }
+  // }, [cursorPos, currentJournal?.entryId.content]);
+
+  const fetchJournal = async () => {
+    if (userData && journalId) {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/journal-entry/${journalId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData.id),
+        });
+
+        const { entryAnalysis } = await response.json();
+        setJournal(entryAnalysis);
+      } catch (error) {
+        console.error("Error fetching journal:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [cursorPos, text]);
-
-  const userData = useUserStore((state) => state.getUser());
+  };
 
   useEffect(() => {
-    if (journal) {
-      const journalContent = journal?.entryId?.content ?? "";
-      setText(journalContent);
-      setJournal(journal);
-      setCursorPos(journalContent.length);
-      setAnalysis({
-        subject: journal?.subject ?? "No Subject",
-        mood: journal?.mood ?? "No Mood",
-        negative: journal?.negative ?? false,
-      });
-      setIsLoading(false);
-    } else {
-      refreshJournal();
-    }
-  }, [journal, currentJournal]);
+    fetchJournal();
+  }, [journalId, userData]);
 
   const handleStartRecord = () => {
     if (!recognitionRef.current) {
@@ -386,26 +393,30 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
           }
         }
 
-        if (textAreaRef.current) {
-          textAreaRef.current.focus();
-        }
+        if (transcript && textAreaRef.current) {
+          const start = textAreaRef.current!.selectionStart;
+          const end = textAreaRef.current!.selectionEnd;
 
-        if (transcript) {
-          setText((prevText) => {
-            if (textAreaRef.current) {
-              const start = textAreaRef.current!.selectionStart;
-              const end = textAreaRef.current!.selectionEnd;
-
-              const newText =
-                prevText.slice(0, start) + transcript + prevText.slice(end);
+          setJournal((prev) => {
+            if (prev) {
+              const updatedContent =
+                prev.entryId.content.slice(0, start) +
+                transcript +
+                prev.entryId.content.slice(end);
 
               const newCursorPos = start + transcript.length;
               setCursorPos(newCursorPos);
-
-              return newText;
+              return {
+                ...prev,
+                entryId: {
+                  ...prev.entryId,
+                  content: updatedContent,
+                },
+              };
             }
-            return prevText + transcript;
+            return prev;
           });
+          textAreaRef.current.focus();
         }
       };
 
@@ -440,16 +451,19 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
     else handleStartRecord();
   };
 
-  const handleCursorChange = () => {
-    if (textAreaRef.current) {
-      setCursorPos(textAreaRef.current.selectionStart);
-    }
-  };
+  // const handleCursorChange = () => {
+  //   if (textAreaRef.current) {
+  //     setCursorPos(textAreaRef.current.selectionStart);
+  //   }
+  // };
 
   const handleDelete = async () => {
     try {
-      if (journal?.entryId && userData && userData?.id) {
-        const { data } = await deleteJournal(journal?.entryId?._id, userData);
+      if (currentJournal?.entryId && userData && userData?.id) {
+        const { data } = await deleteJournal(
+          currentJournal?.entryId?._id,
+          userData
+        );
         if (data) {
           const url = new URL("/journal", window.location.origin);
           url.searchParams.append("deleted", data.id);
@@ -478,19 +492,6 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
     setIsDialogOpen(false);
   };
 
-  const handleJournalUpdate = async (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    const newText = e.target.value as string;
-    setText(newText);
-    setJournal(journal);
-
-    if (newText === journal?.entryId?.content) return;
-
-    setIsSaving(true);
-    setTimeout(() => setIsSaving(false), 2000);
-  };
-
   const handleSave = async () => {
     setIsLoading(true);
     const journalId = currentJournal?.entryId?._id;
@@ -503,14 +504,18 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
     try {
       let res;
       if (journalId && userData && userData?.id)
-        res = await updateJournal(journalId, { content: text }, userData);
+        res = await updateJournal(
+          journalId,
+          { content: currentJournal?.entryId?.content },
+          userData
+        );
 
       if (res && res.data) {
         setJournal(res.data);
         setMessage("Journal updated!");
         setShowBanner(true);
         setTimeout(() => setShowBanner(false), 2000);
-        refreshJournal();
+        //fetchJournal();
       } else {
         console.error("Failed to update journal or no data returned:", res);
       }
@@ -545,7 +550,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
     doc.text(`Subject: ${analysis.subject}`, margin, 30);
     doc.text(`Mood: ${analysis.mood}`, margin, 40);
 
-    const content = `Content: ${text}`;
+    const content = `Content: ${currentJournal?.entryId.content}`;
     const contentLines = doc.splitTextToSize(
       content,
       doc.internal.pageSize.width - margin * 2
@@ -575,7 +580,7 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
             }),
             new Paragraph(`Subject: ${analysis.subject}`),
             new Paragraph(`Mood: ${analysis.mood}`),
-            new Paragraph(`Content: ${text}`),
+            new Paragraph(`Content: ${currentJournal?.entryId.content}`),
           ],
         },
       ],
@@ -649,11 +654,20 @@ const JournalEditor: React.FC<journalEditorPropType> = ({
           </TextSpinnerContainer>
         ) : (
           <TextArea
-            value={text}
-            onChange={handleJournalUpdate}
-            onClick={handleCursorChange}
-            onKeyUp={handleCursorChange}
-            onInput={handleCursorChange}
+            value={currentJournal?.entryId?.content || ""}
+            onChange={(e) =>
+              setJournal((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      entryId: { ...prev.entryId, content: e.target.value },
+                    }
+                  : null
+              )
+            }
+            // onClick={handleCursorChange}
+            // onKeyUp={handleCursorChange}
+            // onInput={handleCursorChange}
           />
         )}
       </EditorContainer>
