@@ -311,7 +311,6 @@ const StyledRecordSvg = styled.svg.withConfig({
 const JournalEditor: React.FC = () => {
   //const [text, setText] = useState("New content");
   const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
-  const [isBrowser, setIsBrowser] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string | null>(null);
@@ -360,6 +359,11 @@ const JournalEditor: React.FC = () => {
 
         const { entryAnalysis } = await response.json();
         setJournal(entryAnalysis);
+        setAnalysis(prev => ({
+          subject: entryAnalysis?.subject || "",
+          mood: entryAnalysis?.mood || "",
+          negative: entryAnalysis?.negative || false
+        }));
       } catch (error) {
         console.error("Error fetching journal:", error);
       } finally {
@@ -369,6 +373,12 @@ const JournalEditor: React.FC = () => {
   };
 
   useEffect(() => {
+    setJournal(null);
+    setAnalysis({
+      subject: "",
+      mood: "",
+      negative: false,
+    })
     fetchJournal();
   }, [journalId, userData]);
 
@@ -512,6 +522,11 @@ const JournalEditor: React.FC = () => {
 
       if (res && res.data) {
         setJournal(res.data);
+        setAnalysis(prev => ({
+          subject: res.data.analysis.subject,
+          mood: res.data.analysis.mood,
+          negative: res.data.analysis.negative
+        }));
         setMessage("Journal updated!");
         setShowBanner(true);
         setTimeout(() => setShowBanner(false), 2000);

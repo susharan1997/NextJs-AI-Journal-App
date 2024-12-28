@@ -5,6 +5,7 @@ import { useFormattedColors } from "@/utils/useFormattedColors";
 
 interface JournalEntryCardProps {
   entry: JournalEntryAnalysisType;
+  handleCardClick: () => void;
 }
 
 const Card = styled.div`
@@ -15,7 +16,8 @@ const Card = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   width: 360px;
   min-height: 180px;
-  margin: 10px;
+  margin: 5px;
+  cursor: pointer;
 `;
 
 const Divider = styled.div`
@@ -66,11 +68,11 @@ const BoldText = styled.span`
   font-size: 12px;
 `;
 
-const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry }) => {
+const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, handleCardClick }) => {
   const date = new Date(entry?.createdAt).toLocaleString();
   const color = useFormattedColors(entry?.analysis?.color!);
   return (
-    <Card>
+    <Card onClick={handleCardClick}>
       <Section>
         <BoldText>Created on</BoldText> {date}
       </Section>

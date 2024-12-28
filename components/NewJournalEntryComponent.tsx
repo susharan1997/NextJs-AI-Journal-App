@@ -45,6 +45,7 @@ const NewJournalEntryComponent = () => {
     try {
       const data = await newEntry(userData.id);
       if (data?._id) {
+        console.log(data?._id, 'NEW ENTRY ID');
         router.push(`/journal/${data._id}`);
       } else {
         console.log(`Invalid data response: ${data}`);

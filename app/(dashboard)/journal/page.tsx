@@ -58,6 +58,11 @@ const EmptyText = styled.span`
   color: white;
 `;
 
+const StyledLink = styled(Link)`
+  width: 360px;
+  margin: 10px;
+`;
+
 function JournalComponent() {
   const [message, setMessage] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(false);
@@ -74,7 +79,7 @@ function JournalComponent() {
   const [emotionType, setEmotionType] = useState<string>("");
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { setUser } = useUserStore();
+  const { setUser, setJournalId, getJournalId } = useUserStore();
 
   useEffect(() => {
     const deletedId = searchParams.get("deleted");
@@ -190,6 +195,11 @@ function JournalComponent() {
     setSelectedScore(-10);
   };
 
+  const handleCardClick = (id: string) => {
+    setJournalId(id);
+    router.push(`/journal/${id}`);
+  }
+
   const handleSlider = (e: any) => {
     setSelectedScore(Number(e.target.value));
   };
@@ -225,19 +235,13 @@ function JournalComponent() {
       />
       <JournalsContainer>
         {emptyMsg ? (
-          <EmptyJournalContainer>
+          <EmptyJournalContainer>.,
             <EmptyText>No Journal entries found</EmptyText>
-          </EmptyJournalContainer>
+          </EmptyJournalContainer> 
         ) : (
           (filteredEntries || entries)?.map(
-            (journal: JournalEntryAnalysisType, index: number) => (
-              <Link
-                href={`/journal/${journal?._id}`}
-                key={journal?._id}
-                passHref
-              >
-                <JournalEntryCard key={index} entry={journal} />
-              </Link>
+            (journal: JournalEntryAnalysisType) => (
+                <JournalEntryCard key={journal._id} entry={journal} handleCardClick={() => handleCardClick(journal._id)} />
             )
           )
         )}
