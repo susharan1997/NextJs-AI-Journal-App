@@ -13,11 +13,6 @@ import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph } from "docx";
 import saveAs from "file-saver";
 
-// interface journalEditorPropType {
-//   journal: EntryAnalysisType | null;
-//   refreshJournal: () => void;
-// }
-
 interface emotionTypes {
   subject: string;
   mood: string;
@@ -282,7 +277,6 @@ const RecordButton = styled.button`
 
   &:disabled {
     background-color: grey;
-    cursor: none;
   }
 `;
 
@@ -309,9 +303,7 @@ const StyledRecordSvg = styled.svg.withConfig({
 `;
 
 const JournalEditor: React.FC = () => {
-  //const [text, setText] = useState("New content");
   const [currentJournal, setJournal] = useState<EntryAnalysisType | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState<boolean>(false);
@@ -332,19 +324,6 @@ const JournalEditor: React.FC = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const downloadItemsList = ["PDF", "Word"];
 
-  // useEffect(() => {
-  //   return () => {
-  //     if (recognitionRef.current) recognitionRef.current.stop();
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (textAreaRef.current) {
-  //     textAreaRef.current.selectionStart = cursorPos;
-  //     textAreaRef.current.selectionEnd = cursorPos;
-  //   }
-  // }, [cursorPos, currentJournal?.entryId.content]);
-
   const fetchJournal = async () => {
     if (userData && journalId) {
       try {
@@ -359,10 +338,10 @@ const JournalEditor: React.FC = () => {
 
         const { entryAnalysis } = await response.json();
         setJournal(entryAnalysis);
-        setAnalysis(prev => ({
+        setAnalysis((prev) => ({
           subject: entryAnalysis?.subject || "",
           mood: entryAnalysis?.mood || "",
-          negative: entryAnalysis?.negative || false
+          negative: entryAnalysis?.negative || false,
         }));
       } catch (error) {
         console.error("Error fetching journal:", error);
@@ -378,9 +357,22 @@ const JournalEditor: React.FC = () => {
       subject: "",
       mood: "",
       negative: false,
-    })
+    });
     fetchJournal();
   }, [journalId, userData]);
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) recognitionRef.current.stop();
+    };
+  });
+
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.selectionStart = cursorPos;
+      textAreaRef.current.selectionEnd = cursorPos;
+    }
+  }, [cursorPos, currentJournal?.entryId?.content]);
 
   const handleStartRecord = () => {
     if (!recognitionRef.current) {
@@ -404,6 +396,7 @@ const JournalEditor: React.FC = () => {
         }
 
         if (transcript && textAreaRef.current) {
+          const textArea = textAreaRef.current;
           const start = textAreaRef.current!.selectionStart;
           const end = textAreaRef.current!.selectionEnd;
 
@@ -426,7 +419,13 @@ const JournalEditor: React.FC = () => {
             }
             return prev;
           });
-          textAreaRef.current.focus();
+          setTimeout(() => {
+            textArea.focus();
+            textArea.setSelectionRange(
+              start + transcript.length,
+              start + transcript.length
+            );
+          }, 0);
         }
       };
 
@@ -461,11 +460,9 @@ const JournalEditor: React.FC = () => {
     else handleStartRecord();
   };
 
-  // const handleCursorChange = () => {
-  //   if (textAreaRef.current) {
-  //     setCursorPos(textAreaRef.current.selectionStart);
-  //   }
-  // };
+  const handleCursorChange = () => {
+    if (textAreaRef.current) setCursorPos(textAreaRef.current.selectionStart);
+  };
 
   const handleDelete = async () => {
     try {
@@ -522,15 +519,14 @@ const JournalEditor: React.FC = () => {
 
       if (res && res.data) {
         setJournal(res.data);
-        setAnalysis(prev => ({
+        setAnalysis((prev) => ({
           subject: res.data.analysis.subject,
           mood: res.data.analysis.mood,
-          negative: res.data.analysis.negative
+          negative: res.data.analysis.negative,
         }));
         setMessage("Journal updated!");
         setShowBanner(true);
         setTimeout(() => setShowBanner(false), 2000);
-        //fetchJournal();
       } else {
         console.error("Failed to update journal or no data returned:", res);
       }
@@ -618,18 +614,7 @@ const JournalEditor: React.FC = () => {
           </DialogBox>
         </DialogOverlay>
       )}
-      <SpinnerContainer>
-        {isSaving ? (
-          <div role="status">
-            <span>Saving...</span>
-          </div>
-        ) : (
-          <div>
-            <Spinner />
-          </div>
-        )}
-      </SpinnerContainer>
-      <RecordButton onClick={handleRecord} disabled={isLoading || isSaving}>
+      <RecordButton onClick={handleRecord} disabled={isLoading}>
         {isRecording ? "Stop" : "Speak"}
         {isRecording ? (
           <StyledRecordSvg
@@ -670,6 +655,7 @@ const JournalEditor: React.FC = () => {
         ) : (
           <TextArea
             value={currentJournal?.entryId?.content || ""}
+            ref={textAreaRef}
             onChange={(e) =>
               setJournal((prev) =>
                 prev
@@ -680,9 +666,9 @@ const JournalEditor: React.FC = () => {
                   : null
               )
             }
-            // onClick={handleCursorChange}
-            // onKeyUp={handleCursorChange}
-            // onInput={handleCursorChange}
+            onClick={handleCursorChange}
+            onKeyUp={handleCursorChange}
+            onInput={handleCursorChange}
           />
         )}
       </EditorContainer>
@@ -703,19 +689,16 @@ const JournalEditor: React.FC = () => {
           </AnalysisListItem>
           <AnalysisListItem>
             <ButtonContainer>
-              <SaveButton onClick={handleSave} disabled={isLoading || isSaving}>
+              <SaveButton onClick={handleSave} disabled={isLoading}>
                 Update
               </SaveButton>
-              <DeleteButton
-                onClick={handleDeleteClick}
-                disabled={isLoading || isSaving}
-              >
+              <DeleteButton onClick={handleDeleteClick} disabled={isLoading}>
                 Delete
               </DeleteButton>
               <DownloadComponentContainer>
                 <DownloadButton
                   onClick={() => setOpen((prev) => !prev)}
-                  disabled={isLoading || isSaving}
+                  disabled={isLoading}
                 >
                   <ButtonText>Download</ButtonText>
                   <img
